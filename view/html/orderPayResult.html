@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" id="headerReturn">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">支付结果</div>
+</header>
+<article class="c_body Fbtn-L-body">
+    <div class="orderPay-result aui-border-b">
+        <div class="aui-padded-10">
+            <i class="state-icon"></i>
+            <!--   <i class="state-icon state-icon-wrong"></i> -->
+        </div>
+        <div class="opR-text"></div>
+        <div class="opR-info" id="opRInfo">
+            <!-- <div class="aui-font-size-14">服务名称：<i id="titleContext"></i></div>
+            <div class="aui-font-size-14">支付金额：<i id="ORDER_SUM_FEE"></i></div> -->
+        </div>
+    </div>
+    <div class="opR-btns clear-fix">
+        <div class="aui-btn aui-btn-basic aui-btn-outlined fl" id="returnIndex">返回首页</div>
+        <div class="aui-btn aui-btn-basic aui-btn-outlined fr" id="seeOrder">查看订单</div>
+    </div>
+    <div class="opR-time">
+        <span class="aui-text-orange aui-padded-r-15" id="time">5</span>秒后自动跳转至首页
+    </div>
+</article>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script>
+    /* 加载订单数据 */
+    $.ajax({
+        url:"/lsj/toOrderDetailPage",
+        type:"post",
+        data:{rowId:GetQueryString('rowId')},
+        success:function(data){
+            data = JSON.parse(data);
+            console.log(data);
+            var opRInfo;
+            if(data.code == 1){//订单支付成功
+                var db = data.data;
+                $(".state-icon").addClass("state-icon-ok").removeClass("state-icon-wrong");
+                $(".opR-text").html("支付成功！")
+                opRInfo= '<div class="aui-font-size-14">服务名称：'+db.titleContext+'</div>'+
+           				 '<div class="aui-font-size-14">支付金额：'+db.ORDER_SUM_FEE+'</div>';
+                $("#opRInfo").html(opRInfo);
+                /* 并清除这个类型订单的信息 */
+                if(db.titleContext == "王者荣耀排位"){
+                    sessionStorage.setItem("setHasVal1",null);
+                    sessionStorage.setItem("selHeroes1",null);
+                    sessionStorage.setItem("classifyVal1",null);
+                }else if(db.titleContext == "王者荣耀成就"){
+                    sessionStorage.setItem("setHasVal2",null);
+                    sessionStorage.setItem("selHeroes2",null);
+                    sessionStorage.setItem("classifyVal2",null);
+                }else if(db.titleContext == "王者荣耀赏金赛"){
+                    sessionStorage.setItem("setHasVal3",null);
+                    sessionStorage.setItem("selHeroes3",null);
+                    sessionStorage.setItem("classifyVal3",null);
+                }else if(db.titleContext == "王者荣耀熟练度" ){
+                    sessionStorage.setItem("setHasVal4",null);
+                    sessionStorage.setItem("selHeroes4v40",null);
+                    sessionStorage.setItem("classifyVal4v40",null);
+                }else if(db.titleContext == "王者荣耀战力"){
+                	sessionStorage.setItem("setHasVal4",null);
+                	sessionStorage.setItem("selHeroes4v45",null);
+                	sessionStorage.setItem("classifyVal4v45",null);
+                }else if(db.titleContext == "王者荣耀金币"){
+                    sessionStorage.setItem("setHasVal5",null);
+                    sessionStorage.setItem("selHeroes5",null);
+                    sessionStorage.setItem("classifyVal5",null);
+                }else if(db.titleContext == "王者荣耀更多"){
+                    sessionStorage.setItem("setHasVal6",null);
+                    sessionStorage.setItem("selHeroes6",null);
+                    sessionStorage.setItem("classifyVal6",null);
+                }
+            }else if(data.code == "-4"){//订单支付失败
+            	$(".state-icon").addClass("state-icon-wrong").removeClass("state-icon-ok");
+            	$(".opR-text").html("支付失败！");
+            	opRInfo= '<div class="aui-font-size-14">若已支付，资金将返还至您的余额</div>';
+            	$("#opRInfo").html(opRInfo);
+            }else if(data.code == 88888){
+                layer.msg("登录失效");
+                localStorage.setItem("setUserInfo",null);
+                setTimeout(function(){
+                    //iframe层-登录页
+                    loginLayerBox();
+                },1000)
+            }
+        }
+    });
+    function GetQueryString(name) {//页面跳转回来保存type值
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r != null){
+            return r[2];
+        }
+    }
+
+
+    $("#headerReturn").click(function(){
+        returnIndex();
+    });
+    $("#returnIndex").click(function(){
+        returnIndex();
+    });
+    $("#seeOrder").click(function(){
+        seeOrder();
+    });
+
+    function returnIndex(){//返回首页
+        window.location.href="/view/html/index.html";
+    }
+    function seeOrder(){//查看订单
+        window.location.href="/view/html/orderDetail.html?rowId="+GetQueryString("rowId");
+    }
+
+
+    //支付成功5秒自动跳转首页
+    var num = 5;
+    time();
+    function time() {
+        if(num == 0){
+            returnIndex();
+        }else{
+            $("#time").html(num);
+            num--;
+            setTimeout(function(){
+                time();
+            }, 1000);
+        }
+    }
+
+
+
+    try{
+        //加载错误的代码
+        $.ajax({
+            url:"/toAlipayOrderReturn",
+            type:"post",
+            data:{},
+            success:function(data){
+                if(data.code==1){
+
+                }else{
+
+                }
+            }
+        })
+    }catch(err){
+        console.log(err.message)
+    }
+</script>
+</body>
+</html>

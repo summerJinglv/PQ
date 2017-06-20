@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:;" id="typeReturn">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">金币</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body Fbtn-L-body">
+    <div class="type-detail">
+        <ul class="type-part1">
+            <li class="aui-margin-b-10">
+                <label class="fl">版本区服：</label>
+                <div class="form-row sel-row">
+                    <select class="type-select-area">
+                    </select>
+                    <select class="type-select-serve">
+                    </select>
+                </div>
+            </li>
+            <li class="aui-margin-b-10">
+                <label class="fl">当前金币：</label>
+                <div class="form-row">
+                    <input type="text" id="nowGold">
+                </div>
+            </li>
+            <li>
+                <label class="fl">目标金币：</label>
+                <div class="form-row">
+                    <input type="text" id="targetGold">
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner grade-inner">
+                    <div class="aui-list-item-label wAuto fl">铭文等级：</div>
+                    <div class="aui-list-item-input grade-input fl">
+                        <input type="number" placeholder="如:120(非必填)" id="mwLv">
+                    </div>
+                    <div id="classifyItem" class="fr overlay" onclick="">
+                        <span>分类填写</span>
+                        <i class="aui-iconfont aui-icon-right"></i>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-list-item overlay" id="heroItem" onclick="">
+                <div class="aui-list-item-inner" >
+                    <div class="aui-list-item-label">已有英雄</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+        <section class="aui-grid has-hero-grid">
+            <div class="aui-row" id="showSelHeroes"></div>
+        </section>
+        <div class="fix-note">更多代练要求，请与客服沟通！</div>
+    </div>
+</article>
+<footer class="aui-card-list-footer oD-footer aui-border-t">
+    <div class="aui-btn aui-btn-basic aui-btn-block" onclick="notLogin(5)">咨询报价</div>
+</footer>
+<input type="hidden" id="type" value="">
+<input type="hidden" id="tank" value="">
+<input type="hidden" id="soldier" value="">
+<input type="hidden" id="assassin" value="">
+<input type="hidden" id="master" value="">
+<input type="hidden" id="shooter" value="">
+<input type="hidden" id="assist" value="">
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script src="../../js/publicSpace.js"></script>
+<script src="../../js/heroShow.js"></script>
+<script>
+    (function () {
+        setTimeout(loadData,500);
+        function loadData() {
+            try {
+                var getHasVal = JSON.parse(sessionStorage.getItem("setHasVal5"));
+                console.log(getHasVal);
+                $("type").val(getHasVal[0].type);
+                $(".type-select-area").val(getHasVal[0].gameArea);
+                $(".type-select-serve").val(getHasVal[0].gameServer);
+                $(".star-text").eq(0).val(getHasVal[0].nowStar);
+                $("#nowGold").val(getHasVal[0].nowGold);
+                $("#targetGold").val(getHasVal[0].targetGold);
+                $("#mwLv").val(getHasVal[0].mwLv);
+            } catch (err) {
+                console.log(err.message)
+            }
+            //获取铭文类型填写每个具体值，赋值给相应隐藏域
+            typeClassify(GetQueryString("type"));
+        }
+    })();
+
+</script>
+</html>

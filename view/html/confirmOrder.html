@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+  <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+  <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+    <span class="aui-iconfont aui-icon-left"></span>
+  </a>
+  <div class="aui-title">确认订单</div>
+  <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+	<span class="aui-iconfont aui-icon-home"></span>
+  </a>
+</header>
+  <article class="c_body Fbtn-L-body">
+    <div class="aui-bg-white aui-border-b aui-font-size-14">
+      <ul class="oD-list">
+        <li class="oD-item aui-border-b" id="partFirst">
+          <!-- <div class="oD-row-tit clear-fix aui-text-orange">
+            <div class="oD-col-l  aui-text-basic aui-font-size-14">2017-03-26 22:22:22</div>
+            <div class="oD-col-r">订单金额：￥150</div>
+          </div>
+          <div class="oD-row clear-fix">
+            <div class="oD-col-l">订单号：2017252548977</div>
+            <div class="oD-col-r">代练时间：36小时</div>
+          </div> -->
+        </li>
+      </ul>
+      <ul class="type-part1">
+        <li class="aui-margin-b-10 aui-margin-t-15">
+          <label class="fl">登录账号：</label>
+          <div class="form-row">
+            <input type="text" placeholder="必填" id="gameAccount">
+          </div>
+        </li>
+        <li class="aui-margin-b-10">
+          <label class="fl">登录密码：</label>
+          <div class="form-row">
+            <input type="password" placeholder="必填" id="gamePwd">
+          </div>
+        </li>
+        <li class="aui-margin-b-10">
+          <label class="fl">角色名称：</label>
+          <div class="form-row">
+            <input type="text" placeholder="必填" id="gameRoleName">
+          </div>
+        </li>
+        <li class="aui-margin-b-15">
+          <label class="fl">联系号码：</label>
+          <div class="form-row">
+            <input type="text" placeholder="必填" id="phone">
+          </div>
+        </li>
+      </ul>
+      <ul class="oD-list">
+        <li class="oD-item aui-border-t" id="partThird">
+          <!-- <div class="oD-row">版本区服：王者荣耀/苹果QQ/不死之炎</div>
+          <div class="oD-row">代练类型：王者荣耀 排位</div>
+          <div class="oD-row">开始段位：秩序青铜-Ⅰ-3星</div>
+          <div class="oD-row">结束段位：尊贵铂金-Ⅰ-3星</div>
+          <div class="oD-row">铭文等级：法师130，战士120</div>
+          <div class="oD-row">已有英雄：程咬金，亚瑟，妹子，猴子</div> -->
+        </li>
+      </ul>
+    </div>
+  </article>
+<footer class="aui-card-list-footer oD-footer aui-border-t">
+  <div class="aui-btn aui-btn-basic aui-btn-block" id="confirmOrderPay">去付款</div>
+</footer>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+	loadFirst();
+	function loadFirst(){//开始加载页面，展示订单信息，获取本地联系号码
+		var setUserInfo= JSON.parse(localStorage.getItem("setUserInfo"));
+		console.log(setUserInfo)
+		if(setUserInfo!=null){
+			$("#phone").val(setUserInfo[0].userPhone);
+		}
+		$.ajax({
+			url:'/toConfirmOrder',
+			type:'post',
+			data:{rowId:GetQueryString("rowId")},
+			success:function(data){
+				data=JSON.parse(data);
+				console.log(data);
+				if(data.code=="1"){
+					var db=data.data;
+					var partFirstHtml='<div class="oD-row-tit clear-fix aui-text-orange">'+
+							             '<div class="oD-col-l  aui-text-basic aui-font-size-14">'+db.TIME_ORDER_CREATE+'</div>'+
+							             '<div class="oD-col-r">'+db.ORDER_SUM_FEE+'</div>'+
+						              '</div>'+
+						          	  '<div class="oD-row oD-row-flex">'+
+							             '<div id="'+db.ROW_ID+'">'+db.ORDER_NO+'</div>'+
+							             '<div>'+db.DL_HOUR+'</div>'+
+						          	  '</div>';
+					$("#partFirst").html(partFirstHtml);
+					var partThirdHtml='<div class="oD-row">'+db.gameService+'</div>'+
+							          '<div class="oD-row">代练类型：'+db.titleContext+'</div>'+
+							          '<div class="oD-row">'+
+							         	 '<label class="oD-row-left">'+(db.START_DAN_TYPE==null?"":db.START_DAN_TYPE.split('：')[0]+' : ')+'</label>'+
+							         	 '<div class="oD-row-right">'+(db.START_DAN_TYPE==null?"":db.START_DAN_TYPE.split('：')[1])+'</div>'+
+							          '</div>'+
+							          '<div class="oD-row">'+
+							         	 '<label class="oD-row-left">'+((db.END_DAN_TYPE==null||db.END_DAN_TYPE=="")?"":db.END_DAN_TYPE.split('：')[0]+' : ')+'</label>'+
+							         	 '<div class="oD-row-right">'+((db.END_DAN_TYPE==null||db.END_DAN_TYPE=="")?"":db.END_DAN_TYPE.split('：')[1])+'</div>'+
+							          '</div>'+
+							          '<div class="oD-row">'+
+							         	 '<label class="oD-row-left">'+(db.INSCRIPTIONS_LEVEL==null?"":(db.INSCRIPTIONS_LEVEL.split('：')[0])+' : ')+'</label>'+
+							         	 '<div class="oD-row-right">'+(db.INSCRIPTIONS_LEVEL==null?"":db.INSCRIPTIONS_LEVEL.split('：')[1])+'</div>'+
+							          '</div>'+
+							          '<div class="oD-row">'+
+							          	'<label class="oD-row-left">'+(db.HERO==null?"":(db.HERO.split('：')[0]+' : '))+'</label>'+
+							          	'<div class="oD-row-right">'+(db.HERO==null?"":db.HERO.split('：')[1])+'</div>'+
+							          '</div>';
+					$("#partThird").html(partThirdHtml);
+					
+					$(".oD-row-left").each(function(){
+						if($.trim($(this).html()).length>=7){//五个字时，右边marginLeft增加
+							$(this).next(".oD-row-right").addClass("text5-ml")
+						}
+					});
+					
+				}
+			}
+			
+		})
+	}
+	
+    function GetQueryString(name) {//页面跳转回来保存type值
+       var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+       var r = window.location.search.substr(1).match(reg);
+       if(r != null){
+           return r[2];
+       }
+    }
+    
+	function payOrder(){//去付款按钮点击事件
+		var rowId=GetQueryString("rowId");
+		var gameAccount=$("#gameAccount").val();
+		var gameRoleName=$("#gameRoleName").val();
+		var gamePwd=$("#gamePwd").val();
+		var phone=$("#phone").val();
+		var checkPhone=/^1[345678]\d{9}$/;
+		
+		if(gameAccount==""||gameAccount==null){
+			layer.msg("请输入登录账号")
+			return false;
+		}else if(gameRoleName==""||gameRoleName==null){
+			layer.msg("请输入角色名")
+			return false;
+		}else if(gamePwd==""||gamePwd==null){
+			layer.msg("请输入登录密码")
+			return false;
+		}else if(phone==""||phone==null){
+			layer.msg("请输入联系号码")
+			return false;
+		}else if(!checkPhone.test(phone)){
+			layer.msg("请输入正确的联系号码");
+			$("#phone").val("");
+			return false;
+		}else{
+			$.ajax({
+				url:'/toConfirmOrderPay',
+				type:'post',
+				data:{rowId:rowId,gameAccount:gameAccount,gameRoleName:gameRoleName,gamePwd:gamePwd,phone:phone},
+				dataType:"json",
+				success:function(data){
+					console.log(data);
+					//var data=
+					if(data.code==1){
+						window.location.href="./orderPay.html?rowId="+rowId;
+					}
+				}
+			})
+		}
+	}
+	$("#confirmOrderPay").click(function(){
+		payOrder();
+	})
+</script>
+</body>
+</html>

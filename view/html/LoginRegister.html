@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>登录/注册</title>
+</head>
+<body style="text-align:center;background:#FFF;">
+<article class="">
+    <section class="c_lrBox">
+        <div class="c_lrBoxTab clear-fix">
+            <div class="c_lrBoxTab_register">
+                验证码登录
+            </div>
+            <div class="c_lrBoxTab_login bgGray">
+                账号密码登录
+            </div>
+            <input type="hidden" id="loginState" value="0">
+            <input type="hidden" id="loginNeedImg" value="0">
+        </div>
+        <ul class="c_lrBoxCon">
+            <li id="yzmLogin">
+                <input class="c_input" type="text" name="userPhone" maxlength="11" id="userPhone" placeholder="请输入手机号">
+            </li>
+            <li id="login3yx" style="display: none">
+                <input class="c_input" type="text" name="userName" id="userName" placeholder="请输入账号">
+            </li>
+            <li class="c_LoginShow" style="display: none;">
+                <input class="c_input" type="password" name="userPassword" id="userPassword" placeholder="请输入密码">
+            </li>
+            <li class="c_imgCodeShow clear-fix" style="display:none;">
+                <input type="text" name="imgCode" id="imgCode" placeholder="请输入图片验证码">
+                <img id="imgCodePic" alt="点击刷新">
+            </li>
+            <li class="codeLog-box">
+	            <div class="c_registerShow clear-fix">
+	                <input type="text" name="userCode" id="userCode" placeholder="请输入短信验证码">
+	                <button class="aui-btn-disabled" disabled name="getCode" id="getCode" value="获取验证码">获取验证码</button>
+	            </div>
+	            <span class="c_tips">未注册手机将自动创建新账号</span>
+            </li>
+            <li><button class="aui-btn aui-btn-basic aui-btn-block" name="login" id="login" value="登&nbsp;&nbsp;录" style="font-size: 0.8rem;border:none;">登&nbsp;&nbsp;录</button></li>
+            <li>
+                <input type="checkbox" name="checkAgreement" id="checkAgreement" checked >
+                <label for="checkAgreement">同意</label><a class="c_117ACB overlay" id="protocol" onclick="">《商城条款》</a>和<a class="c_117ACB overlay" id="privacyPolicy" onclick="">《隐私政策》</a>
+            </li>
+        </ul>
+    </section>
+</article>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/loginRegister.js"></script>
+</html>

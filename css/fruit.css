@@ -1,0 +1,38 @@
+
+/* GL */
+body{height:100%; overflow: hidden;}
+.for_glb_main{font-family:San FranciscoText-Light,HelveticaNeue-Light,Roboto-Light,微软雅黑;color:#3d4145;overflow:auto; height:100%; width:100%; display: block; position: absolute; z-index: 1; left: 0; top: 0;}
+.glb_main_content{padding:0 0.32rem 0.32rem;background:#f3f3f3;overflow:hidden;}
+.glb_main_content .news-title{padding:0.35rem 0 0;font-size:0.44rem;font-weight:bold;line-height:0.66rem;color:#333;}
+.glb_main_content .news-info{color:#999;font-size:0.28rem;line-height:0.8rem;}
+.glb_main_content .news-info span{margin-right:0.36rem;}
+.glb_main_content .news-info .read{float:right;margin-right:0;}
+.glb_main_content .news-content p{margin:0 auto;color:#333;font-size:0.32rem;line-height:0.52rem;padding:0.3rem 0;}
+.glb_main_content .news-content img{display:block;width:100% !important;height:auto !important;margin-top:0.2rem;margin:0 auto;}
+.glb_main_content .news-footer{margin-top:0.36rem;color:#999;font-size:0.26rem;line-height:0.24rem;}
+
+.glb_feed-list{padding:0 0.3rem;border-top: 1px solid #eaeaea;background:#fff;}
+.glb_feed-list .feed-title{color:#999;font-size:0.32rem;height:0.9rem;line-height:0.9rem;}
+.glb_feed-list ul{height:auto;overflow:hidden;padding-bottom:0.2rem;}
+.glb_feed-list .video-item{height:1.62rem;padding:0.3rem 0;border-top: 1px solid #e7e7e7;}
+.glb_feed-list .item-media{float:left;width:2.30rem;height:1.62rem;margin-right:0.3rem;overflow:hidden;}
+.glb_feed-list .item-media img{display:block;width:100%;height:auto !important;min-height:1.62rem !important;}
+.glb_feed-list .item-title{height:1rem;line-height:0.5rem;font-size:0.36rem;color:#333;overflow:hidden;}
+.glb_feed-list .item-subtitle{line-height:0.5rem;padding-top:0.1rem;color:#999;font-size:0.26rem;}
+
+.for_glb_video{width:100%;}
+.for_glb_video .video_wrap{height:3.7rem;}
+.for_glb_video .info{border-bottom:1px solid #e7e7e7;background:#fff;}
+.for_glb_video .info-title{font-size:0.36rem;color:#333;line-height:0.52rem;padding:0.15rem 0.32rem 0;}
+.for_glb_video .info-subtitle{font-size:0.26rem;line-height:0.6rem;padding:0 0.32rem;color:#999}
+.for_glb_video .info-subtitle span{margin-right:0.2rem;}
+.for_glb_video .info-subtitle .read{float:right;margin-right:0;}
+
+.for_glb_main .videoDetai{background:#fff;}
+
+.for_glb_main.video .glb_main_content .news-footer{text-align:right;padding:0.2rem 0;}
+.for_glb_main.video .glb_feed-list .item-media{position:relative;}
+.for_glb_main.video .glb_feed-list .item-media:before{content:"";position:absolute;top:50%;left:50%;width:0.6rem;height:0.6rem;margin:-0.3rem 0 0 -0.3rem;background:url(http://js1.18183.duoku.com/uploads/wap/zt/glb/play-icon-m.png) center center no-repeat;background-size:100% 100%;}
+.videoDetai .news-content iframe{width:0 !important;height:0 !important;}
+
+.glb_main_content .pc_wap_video video{width:100%;height:3.7rem;margin:0.3rem 0;}

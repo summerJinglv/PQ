@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+  <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+  <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+    <span class="aui-iconfont aui-icon-left"></span>
+  </a>
+  <div class="aui-title">售后进度</div>
+  <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+      <span class="aui-iconfont aui-icon-home"></span>
+  </a>
+</header>
+<article class="c_body">
+  <div class="progress-main">
+    <ul id="lsjOrderDiscuss" class="type-part1 aui-bg-white aui-border-b aui-padded-b-15">
+      <!-- <li>
+        <label class="fl">售后方式：</label>
+        <div class="form-row">退款</div>
+      </li>
+      <li>
+        <label class="fl">退款金额：</label>
+        <div class="form-row">110元</div>
+      </li>
+      <li>
+        <label class="fl">售后原因：</label>
+        <div class="form-row">
+          <div class="reason-text">这是原因具体内容！这是原因具体内容！这是原因具体内容！这是原因具体内容！这是原因具体内容！这是原因具体内容！</div>
+        </div>
+      </li> -->
+    </ul>
+    <div class="clear-fix aui-card-list-content-padded">
+      <div class="fl aui-font-size-16">售后进度：</div>
+      <div class="fr aui-text-orange" id="progressText">系统处理中</div>
+    </div>
+    <div class="progress-list aui-border-b" id="lsjOrderLogsList">
+       <!--  <ul class="on">
+          <li>2017-04-08 22:22:22</li>
+          <li>提交售后申请：退款 50元</li>
+        </ul>
+        <ul>
+          <li>2017-04-08 22:22:22</li>
+          <li>商家同意退款</li>
+        </ul>
+        <ul>
+          <li>2017-04-08 22:22:22</li>
+          <li>系统处理中</li>
+        </ul> -->
+    </div>
+  </div>
+  <div class="chat-btn" onclick="notLogin('chatBtn')">
+    <i class="aui-iconfont aui-icon-xx"></i>
+  </div>
+</article>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script>
+	function GetQueryString(name) {//页面跳转回来保存type值
+	    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+	    var r = window.location.search.substr(1).match(reg);
+	    if(r != null){
+	        return r[2];
+	    }
+	}
+
+	var rowId=GetQueryString("rowId");
+	var discussType="50";
+	console.log(rowId);
+	
+	$.ajax({
+		url:"/lsj/toAfterSalesProgressPage",
+		type:"post",
+		data:{rowId:rowId,discussType:discussType},
+		dataType: "json",
+		success:function(data){
+			if(data.opcode=="0"){
+				console.log(data)
+				var db=data.result;
+				var discussFlag;
+				if(db.lsjOrderDiscuss.discussFlag=="10"){
+					discussFlag="退款";
+				}else{
+					discussFlag="其他";
+				}
+				var lsjOrderDiscuss='<li>'+
+								        '<label class="fl">售后方式：</label>'+
+								        '<div class="form-row">'+discussFlag+'</div>'+
+							        '</li>'+
+							      	'<li>'+
+							        	'<label class="fl">退款金额：</label>'+
+							        	'<div class="form-row">'+db.lsjOrderDiscuss.applyRefundFee+'元</div>'+
+							      	'</li>'+
+							      	'<li>'+
+							        	'<label class="fl">售后原因：</label>'+
+							        	'<div class="form-row">'+
+							          		'<div class="reason-text">'+db.lsjOrderDiscuss.remark+'</div>'+
+							       		'</div>'+
+							      	'</li>';
+				$("#lsjOrderDiscuss").html(lsjOrderDiscuss);
+				var lsjOrderLogsList=db.lsjOrderLogsList;
+				var lsjOrderLogsListHtml=''; 
+				for(var i in lsjOrderLogsList){
+					if(i==0){
+						lsjOrderLogsListHtml+='<ul class="on">' +
+									         	 '<li>'+lsjOrderLogsList[i].optTime+'</li>' +
+									          	'<li>'+lsjOrderLogsList[i].remark+'</li>' +
+								          	  '</ul>';
+						
+					}else{
+						lsjOrderLogsListHtml+='<ul>' +
+										          '<li>'+lsjOrderLogsList[i].optTime+'</li>' +
+										          '<li>'+lsjOrderLogsList[i].remark+'</li>' +
+									          '</ul>';
+					}
+				}
+				$("#progressText").html(lsjOrderLogsList[0].remark.split("：")[0]);
+				$("#lsjOrderLogsList").html(lsjOrderLogsListHtml);
+			}else if(data.code==88888){
+         		layer.msg("登录失效");
+                localStorage.setItem("setUserInfo",null);
+                setTimeout(function(){
+                    //iframe层-登录页
+                   loginLayerBox();
+                },1000)
+         	}else{
+         		console.log(data.msg);
+			}
+		}
+	})
+	
+</script>
+</body>
+</html>

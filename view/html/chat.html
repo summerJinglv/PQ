@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <script type="text/javascript" src="../../js/sockjs.min.js"></script>
+    <title>喷塔Q</title>
+</head>
+<body  id="text">
+<!--头部-->
+<header class="aui-bar aui-bar-nav aui-bar-light">
+    <div class="aui-title">售前客服</div>
+    <a class="aui-pull-right aui-btn" href="javascript:;" onclick="clearNeedCon()">
+        <span class="aui-iconfont aui-icon-close"></span>
+    </a>
+</header>
+<article class="c_body" style="padding-bottom: 60px;">
+    <div class="chat-all clear-fix">
+        <!--客服对话记录-->
+        <div class="aui-card-list-footer aui-text-center" id="moreMessageList">加载更多</div>
+        <section class="aui-chat clear-fix chatBox" id="sectionText">
+            <!--<div class="aui-chat-item aui-chat-left">-->
+            <!--<div class="aui-chat-media">-->
+            <!--<img src="../../images/kefu000.png" />-->
+            <!--</div>-->
+            <!--<div class="aui-chat-inner">-->
+            <!--<div class="aui-chat-content">-->
+            <!--<div class="aui-chat-arrow"></div>-->
+            <!--亲：祝你购物愉快，一天好心情！-->
+            <!--</div>-->
+            <!--<div class="aui-chat-status aui-chat-status-refresh">-->
+            <!--<i class="aui-iconfont aui-icon-correct aui-text-success"></i>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="aui-chat-item aui-chat-right">-->
+            <!--<div class="aui-chat-media">-->
+            <!--<img src="../../images/user000.png" />-->
+            <!--</div>-->
+            <!--<div class="aui-chat-inner">-->
+            <!--<div class="aui-chat-content">-->
+            <!--<div class="aui-chat-arrow"></div>-->
+            <!--已付款-->
+            <!--</div>-->
+            <!--<div class="aui-chat-status">-->
+            <!--<i class="aui-iconfont aui-icon-info aui-text-danger"></i>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="aui-chat-item aui-chat-left">-->
+            <!--<div class="aui-chat-media">-->
+            <!--<img src="../../images/kefu000.png" />-->
+            <!--</div>-->
+            <!--<div class="aui-chat-inner">-->
+            <!--<div class="aui-chat-content">-->
+            <!--<div class="aui-chat-arrow"></div>-->
+            <!--<div>你的订单：</div>-->
+            <!--<div>代练时间：3小时</div>-->
+            <!--<div>订单报价：130元</div>-->
+            <!--<div class="aui-text-right"><a href="/view/html/confirmOrder.html?rowId=17" class="orange aui-font-size-16">点击付款</a></div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="aui-chat-item aui-chat-right">-->
+            <!--<div class="aui-chat-media">-->
+            <!--<img src="../../images/user000.png" />-->
+            <!--</div>-->
+            <!--<div class="aui-chat-inner">-->
+            <!--<div class="aui-chat-content">-->
+            <!--<div class="aui-chat-arrow"></div>-->
+            <!--<img src="http://iph.href.lu/300x300?text=picture&fg=666&bg=ffc" />-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+        </section>
+    </div>
+    <!-- 判断是否已报价times 次数 -->
+    <input type="hidden" id="times" value="0">
+</article>
+<!--输入框-->
+<div class="chat-bar">
+    <div class="aui-iconfont aui-icon-pic pic-add">
+        <img src="" id="pic_edit" width="100%" height="100%" />
+        <input type="file" class="pic_upload"  id="upFile" />
+    </div>
+    <div class="aui-btn aui-btn-basic fr" id="sent_msg">发送</div>
+    <div class="chat-input">
+        <input type="text" id="message" />
+        <input type="hidden" id="sjSubUserId" value=""/>
+    </div>
+</div>
+<input type="hidden" id="pageIndex" value=""/>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script>
+	//聊天背景最小高度
+	$(".chat-all").css({minHeight:$(window).height()-$(".chat-bar").outerHeight()-$(".aui-bar").outerHeight()})
+	
+    var orderNoStr = "";//订单编号
+    var fdUserId = "";//号主id
+    var orderId = "";//商家id
+    var times = $("#times").val();//报价次数
+    $(function(){
+        /* 跳转过来时获取需求资料 */
+        var needCon = JSON.parse(sessionStorage.getItem("needCon"));
+        console.log(needCon);
+        if(GetQueryString("rowId") != undefined){
+            /* 订单已存在跳转过来 */
+            $.ajax({
+                url: "/toMessageView",
+                type: "post",
+                dataType: "json",
+                data:{rowId:GetQueryString("rowId")},
+                success: function(data) {
+                    console.log(data);
+                    orderNoStr = data.orderNo;
+                    fdUserId = data.fdUserId;
+                    $("#sjSubUserId").val(data.sjSubUserId);
+                    messageStyle(data);
+                }
+            });
+        }else if(needCon == null){
+            $("#sectionText").html("未填写需求,请至需求页发布需求");
+            $("#moreMessageList").hide();
+        }else{
+            orderNoStr = needCon.orderNo;
+            fdUserId = needCon.userId;
+            orderId = needCon.rowId;
+            $("#sjSubUserId").val(needCon.sjSubUserId);
+            var needConText = $('<div class="aui-chat-time">'+needCon.createTime+'</div>'+
+                    '<div class="aui-chat-item aui-chat-right">'+
+                    '<div class="aui-chat-media">'+
+                    '<img src="../../images/user000.png" />'+
+                    '</div>'+
+                    '<div class="aui-chat-inner">'+
+                    '<div class="aui-chat-content">'+
+                    '<div class="aui-chat-arrow"></div>'+
+                    '<div>'+needCon.title+'</div>'+
+                    '<div>'+needCon.contents[0].content+'</div>'+
+                    '<div>'+needCon.contents[1].content+'</div>'+
+                    '</div>'+
+                    '<div class="aui-chat-status aui-chat-status-refresh">'+
+                    '<i class="aui-iconfont aui-icon-correct aui-text-success"></i>'+
+                    '</div>'+
+                    '</div>'+
+                    '</div>'+
+                    '<div class="aui-chat-time">系统：咨询单已经提交，客服马上就来哦！</div>');
+            $(".chatBox").append(needConText);
+            show();
+            chatServer();
+        }
+        function chatServer(){
+            /* chatStart */
+            console.log("订单编号 : "+ orderNoStr);
+            console.log("商家ID : "+ fdUserId);
+            console.log("sjSubUserId : "+ $("#sjSubUserId").val());
+            //发送聊天信息
+            var PATH = "${pageContext.request.contextPath}";
+            var websocket = null;
+            if (window['WebSocket']){
+                // ws://host:port/project/websocketpath
+                websocket = new WebSocket("ws://117.34.91.46:8418" + '/websocket');
+            	//websocket = new WebSocket("ws://192.168.192.179:7288/websocket");//需要修改
+            }else{
+                websocket = new SockJS(PATH + '/websocket/socketjs');
+            }
+            websocket.onopen = function(event) {
+                console.log('连接成功了:', event);
+                var sessionKey = fdUserId + "_" + orderNoStr + "_api";//先把自己的信息保存起来
+                websocket.send(sessionKey); //默认的数据
+            };
+            websocket.onmessage = function(event) {
+                /* 聊天接收消息 */
+                console.log('收到消息:', event.data);
+                var msg = $.parseJSON(event.data);
+                console.log(msg);
+                if (msg.orderNo == orderNoStr && msg.messageFrom == '20') {
+                    /* 商家消息 */
+                    if(msg.messageContextFlag == 10){
+                        /* 消息 */
+                        var html = "";
+                        html += '<div class="aui-chat-item aui-chat-left">';
+                        html += '<div class="aui-chat-media">';
+                        html += '<img src="../../images/kefu000.png" />';
+                        html += '</div>';
+                        html += '<div class="aui-chat-inner">';
+                        html += '<div class="aui-chat-content">';
+                        html += '<div class="aui-chat-arrow"></div>';
+                        html += '<div>' + msg.context +'</div>';
+                        html += '<div></div></div>';
+                        $("#sectionText").append(html);
+                        show();
+                    }else if(msg.messageContextFlag == 20){
+                        /* 图片 */
+                        var html = "";
+                        html += '<div class="aui-chat-item aui-chat-left">';
+                        html += '<div class="aui-chat-media">';
+                        html += '<img src="../../images/kefu000.png" />';
+                        html += '</div>';
+                        html += '<div class="aui-chat-inner">';
+                        html += '<div class="aui-chat-content">';
+                        html += '<div class="aui-chat-arrow"></div>';
+                        html += '<img id="sendImg" src="http://imgcdn.3yx.com'+ msg.context +'" />';
+                        html += '<div></div></div>';
+                        $("#sectionText").append(html);
+                        show();
+                    }else if(msg.messageContextFlag == 40){
+                        /* 订单 */
+                        /* 保存订单 times 表明已报价过 则显示已重新报价 */
+                        if(times != 0){
+                            times++;
+                            console.log("报价次数: " + times);
+                            $("#times").val(times);
+                            var html = "";
+                            html += '<div class="aui-chat-time">系统：订单已重新报价，请查看最新报价！</div>';
+                            html += '<div class="aui-chat-item aui-chat-left">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/kefu000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<div>你的订单：</div>';
+                            html += '<div>代练时间：'+msg.contextMap.dlHour+'小时</div>';
+                            html += '<div>订单报价：'+msg.contextMap.orderSumFee+'元</div>';
+                            html += '<div class="aui-text-right"><a  onclick="judgeHasPayInfo()" href="javascript:;" class="orange aui-font-size-16">点击付款</a></div>';
+                            html += '<div></div></div>';
+                            $("#sectionText").append(html);
+                            show();
+                        }else{
+                            times++;
+                            console.log("报价次数: " + times);
+                            $("#times").val(times);
+                            var html = "";
+                            html += '<div class="aui-chat-item aui-chat-left">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/kefu000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<div>你的订单：</div>';
+                            html += '<div>代练时间：'+msg.contextMap.dlHour+'小时</div>';
+                            html += '<div>订单报价：'+msg.contextMap.orderSumFee+'元</div>';
+                            html += '<div class="aui-text-right"><a onclick="judgeHasPayInfo()" href="javascript:;" class="orange aui-font-size-16">点击付款</a></div>';
+                            html += '<div></div></div>';
+
+                            $("#sectionText").append(html);
+                            show();
+
+                        }
+                    }
+                }
+            };
+
+            // 发消息逻辑区
+            $("#sent_msg").click(function(){
+            	$(this).attr("disabled",true);
+                var messageContextFlagStr = 10;//文字
+                var messageStr = $("#message").val();
+                if($("#message").val()=='' && $("#upFile").val() == ''){
+                    layer.tips('发送消息不能为空', '#message',{
+                        tips: [1, '#66AFE6'], //还可配置颜色
+                        time: 2000
+                    });
+                    $(this).removeAttr("disabled");
+                    return;
+                }
+                var fileName = "";
+                var html = "";
+                if ($("#upFile").val() != '') {
+                    var imgPath = $("#upFile").val();
+                    fileName = imgPath.substr(imgPath.lastIndexOf('/') + 1);
+                    var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+                    if (strExtension != 'jpg' && strExtension != 'gif'
+                            && strExtension != 'png' && strExtension != 'bmp' && strExtension != 'jpeg') {
+                        layer.tips('只能发送图片文件', '#message',{
+                            tips: [1, '#66AFE6'], //还可配置颜色
+                            time: 2000
+                        });
+                        return;
+                    }
+                    messageContextFlagStr = 20;//图片消息
+                    var imgFile = new FileReader();
+                    var img = document.getElementById('upFile');
+                    imgFile.readAsDataURL(img.files[0]);
+                    imgFile.onload = function () {
+                        messageStr = this.result; //base64数据
+                        html += '<div class="aui-chat-item aui-chat-right">';
+                        html += '<div class="aui-chat-media">';
+                        html += '<img src="${ctx}/images/user000.png" />';
+                        html += '</div>';
+                        html += '<div class="aui-chat-inner">';
+                        html += '<div class="aui-chat-content">';
+                        html += '<div class="aui-chat-arrow"></div>';
+                        html += '<img  id="sendImg" src="'+messageStr+'" />';//此处要修改
+                        html += '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                        $("#upFile").val("");
+                        $("#pic_edit").hide();
+                        //让滚动条始终保持在最下面
+                        var url= PATH + "/sendMessage_NL?t="+new Date().getTime();
+                        var usernameStr= $("#sjSubUserId").val() + "_" + orderNoStr + "_oa";
+                        $.post(url,{username:usernameStr,
+                            message:messageStr,
+                            messageContextFlag:messageContextFlagStr,
+                            orderNo:orderNoStr,
+                            messageFrom:'10',
+                            messageRecive:'20',
+                            sjSubUserId:$("#sjSubUserId").val(),
+                            fileName:fileName
+                        },function(data){
+                            $(this).removeAttr("disabled");
+                            $("#sectionText").append(html);
+                            show();
+                        });
+                        
+                    }
+                }
+                if ($("#upFile").val() == '' && $("#message").val()!='') {
+                    html += '<div class="aui-chat-item aui-chat-right">';
+                    html += '<div class="aui-chat-media">';
+                    html += '<img src="../../images/user000.png" />';
+                    html += '</div>';
+                    html += '<div class="aui-chat-inner">';
+                    html += '<div class="aui-chat-content">';
+                    html += '<div class="aui-chat-arrow"></div>';
+                    html += '<div>' + $("#message").val() +'</div>';
+                    html += '<div></div></div>';
+                    //让滚动条始终保持在最下面
+                    
+                    $("#message").val("");
+                    var url= PATH + "/sendMessage_NL?t="+new Date().getTime();
+                    var usernameStr= $("#sjSubUserId").val() + "_" + orderNoStr + "_oa";
+                    $.post(url,{username:usernameStr,
+                        message:messageStr,
+                        messageContextFlag:messageContextFlagStr,
+                        orderNo:orderNoStr,
+                        messageFrom:'10',
+                        messageRecive:'20',
+                        sjSubUserId:$("#sjSubUserId").val()
+                    },function(data){
+                        $(this).removeAttr("disabled");
+                        $("#sectionText").append(html);
+                        show();
+                        //alert(data);
+                    });
+                    
+                }
+            });
+            /* chatEnd */
+        }
+        /* 图片发送触发事件 */
+        $(function(){
+            $(".pic_upload").change(function(){
+                $("#pic_edit").show();
+                var imgFile = new FileReader();
+                var img = document.getElementById('upFile');
+                imgFile.readAsDataURL(img.files[0]);
+                imgFile.onload = function () {
+                    $("#pic_edit").attr("src",this.result);
+                }
+            });
+        });
+
+
+        function show(){
+            //content:存放消息的div
+            $("#text")[0].scrollTop = $("#text")[0].scrollHeight;
+        }
+        /* 加载更多消息 */
+        $("#moreMessageList").click(moreMessageList);
+        function moreMessageList(){
+            $.ajax({
+                url: "/getMoreMessageList",
+                type: "post",
+                dataType: "json",
+                data:{rowId:GetQueryString("rowId"),pageIndex:$("#pageIndex").val()},
+                success: function(data) {
+                    console.log(data);
+                    console.log(data);
+                    if(data.messageList.length<6){
+                        $("#moreMessageList").html("暂无更多消息");
+                    }
+                    messageStyle(data);
+                    $("#pageIndex").val(data.pageIndex);
+                }
+            })
+        }
+        /* 获取到消息执行的方法 */
+        function messageStyle(data){
+            if(data.code == 1){
+                var messageList = data.messageList;
+                console.log(messageList);
+                for(var i in messageList){
+                    if(messageList[i].messageFrom == 10){
+                        /* 号主 */
+                        if(messageList[i].messageContextFlag == 10){
+                            /* 消息 */
+                            var html = "";
+                            html += '<div class="aui-chat-time">'+messageList[i].time+'</div>';
+                            html += '<div class="aui-chat-item aui-chat-right">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/user000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<div>' + messageList[i].context +'</div>';
+                            html += '<div></div></div>';
+                            $("#sectionText").prepend(html);
+                            show();
+                        }else if(messageList[i].messageContextFlag == 20){
+                            /* 图片 */
+                            var html = "";
+                            html += '<div class="aui-chat-time">'+messageList[i].time+'</div>';
+                            html += '<div class="aui-chat-item aui-chat-right">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/user000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<img id="sendImg" src="http://imgcdn.3yx.com'+ messageList[i].context +'" />';
+                            html += '<div></div></div>';
+                            $("#sectionText").prepend(html);
+                            show();
+                        }else if(messageList[i].messageContextFlag == 30){
+                            /* 订单 */
+                            var html = "";
+                            html += '<div class="aui-chat-time">'+messageList[i].time+'</div>';
+                            html += '<div class="aui-chat-item aui-chat-right">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/user000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<div>'+messageList[i].context+'</div>';
+                            html += '<div>'+messageList[i].contextMap.END_DAN_TYPE+'</div>';
+                            html += '<div>'+messageList[i].contextMap.START_DAN_TYPE+'</div>';
+                            html += '<div></div></div>';
+                            $("#sectionText").prepend(html);
+                            show();
+                        }
+                    }else if(messageList[i].messageFrom == 20){
+                        /* 商家 */
+                        if(messageList[i].messageContextFlag == 10){
+                            /* 消息 */
+                            var html = "";
+                            html += '<div class="aui-chat-item aui-chat-left">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/kefu000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<div>' + messageList[i].context +'</div>';
+                            html += '<div></div></div>';
+                            $("#sectionText").prepend(html);
+                            show();
+                        }else if(messageList[i].messageContextFlag == 20){
+                            /* 图片 */
+                            var html = "";
+                            html += '<div class="aui-chat-item aui-chat-left">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/kefu000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<img  id="sendImg" src="http://imgcdn.3yx.com'+ messageList[i].context +'" />';
+                            html += '<div></div></div>';
+                            $("#sectionText").prepend(html);
+                            show();
+                        }else if(messageList[i].messageContextFlag == 40){
+                            /* 订单 */
+                            /* 保存订单 times 表明已报价过 */
+                            times++;
+                            console.log("报价次数: " + times);
+                            $("#times").val(times);
+                            var html = "";
+                            html += '<div class="aui-chat-item aui-chat-left">';
+                            html += '<div class="aui-chat-media">';
+                            html += '<img src="../../images/kefu000.png" />';
+                            html += '</div>';
+                            html += '<div class="aui-chat-inner">';
+                            html += '<div class="aui-chat-content">';
+                            html += '<div class="aui-chat-arrow"></div>';
+                            html += '<div>你的订单：</div>';
+                            html += '<div>代练时间：'+data.dlHour+'小时</div>';
+                            html += '<div>订单报价：'+data.orderSumFee+'元</div>';
+                            html += '<div class="aui-text-right"><a onclick="judgeHasPayInfo()" href="javascript:;" class="orange aui-font-size-16">点击付款</a></div>';
+                            html += '<div></div></div>';
+                            $("#sectionText").prepend(html);
+                            show();
+                        }
+                    }
+                }
+                /* 进来的时间 */
+                $(".sectionText").append('<div class="aui-chat-time">'+data.nowTime+'</div>');
+                $("#pageIndex").val(data.pageIndex);
+                chatServer();
+            }else if(data.code == 88888){
+                layer.msg("登录失效");
+                localStorage.setItem("setUserInfo",null);
+                setTimeout(function(){
+                    //iframe层-登录页
+                    loginLayerBox();
+                },1000)
+            }
+        }
+
+        /* 获取url地址的方法 */
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r != null){
+                return r[2];
+            }
+        }
+    });
+    /* 1.判断是否付过款 2.判断有无填写账号密码 */
+    function judgeHasPayInfo(){
+        /* 区分首次进来还是其他入口进来 */
+        var needCon = JSON.parse(sessionStorage.getItem("needCon"));
+        var rowId = (GetQueryString("rowId") == null) ? needCon.rowId : GetQueryString("rowId") ;
+        $.ajax({
+            url:'/lsj/checkInfo',
+            type:'post',
+            data:{rowId:rowId},
+            success:function(data){
+                data = JSON.parse(data);
+                if(data.opcode == 0){ //跳入确认订单页面
+                    window.location.href="/view/html/confirmOrder.html?rowId="+rowId;
+                }else if(data.opcode == 1){ //跳入订单支付页面
+                    window.location.href="/view/html/orderPay.html?rowId="+rowId;
+                }else if(data.opcode == -1){ //跳入详情页
+                    window.location.href="/view/html/orderDetail.html?rowId="+rowId;
+                }
+            }
+        })
+    }
+    /* 获取url地址的方法 */
+    function GetQueryString(name) {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r != null){
+            return r[2];
+        }
+    }
+    /* 点击叉号清除 needCon */
+    function clearNeedCon(){
+        sessionStorage.setItem("needCon",null);
+        history.go(-1);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <link rel="apple-touch-icon" sizes="48x48" href="../../images/pentaq_icon_58x58">
+    <link rel="apple-touch-icon" sizes="72x72" href="../../images/pentaq_icon_80x80.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="../../images/pentaq_icon_87x87">
+    <link rel="apple-touch-icon" sizes="144x144" href="../../images/pentaq_icon_120x120.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="../../images/pentaq_icon_180x180.png">
+    <meta name="applicable-device" content="mobile" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <link href="../../favicon.ico" rel="shortcut icon"/>
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <div class="aui-title">喷塔<span>Q</span></div>
+    <a class="aui-pull-right aui-btn" href="/view/html/userCenter.html">
+        <span class="aui-iconfont aui-icon-user"></span>
+    </a>
+</header>
+<article class="c_body">
+    <!--焦点图-->
+    <div id="slideBox" class="slide-box">
+        <div class="bd">
+            <ul id="slidepic">
+                <!-- 焦点图 -->
+            </ul>
+        </div>
+        <div class="hd">
+            <ul></ul>
+        </div>
+    </div>
+    <!--news垂直滚动-->
+    <div id="newsScroll" class="news-scroll clear-fix">
+        <div class="aui-pull-left"><i class="aui-iconfont aui-icon-lb aui-margin-r-5"></i>公告：</div>
+        <ul id="noticelist">
+        </ul>
+    </div>
+    <!--栅格宫格-->
+    <section class="index-grid aui-grid">
+        <div class="aui-info">
+            <div class="aui-info-item">
+                <i class="aui-iconfont aui-icon-yx"></i><span class="aui-margin-l-5">王者荣耀</span>
+            </div>
+        </div>
+        <div class="aui-row">
+            <div class="aui-col-xs-4" onclick="window.location.href = '/view/html/ranking.html?type=1'">
+                <i class="aui-iconfont aui-icon-pw"></i>
+                <div class="aui-grid-label">排位赛</div>
+            </div>
+            <div class="aui-col-xs-4" onclick="window.location.href = '/view/html/achievement.html?type=2'">
+                <i class="aui-iconfont aui-icon-cj"></i>
+                <div class="aui-grid-label">成就</div>
+            </div>
+            <div class="aui-col-xs-4" onclick="window.location.href = '/view/html/reward.html?type=3'">
+                <i class="aui-iconfont aui-icon-jjs"></i>
+                <div class="aui-grid-label">赏金联赛</div>
+            </div>
+            <div class="aui-col-xs-4" onclick="window.location.href = '/view/html/proficiency.html?type=4'">
+                <i class="aui-iconfont aui-icon-sld"></i>
+                <div class="aui-grid-label">熟练度</div>
+            </div>
+            <div class="aui-col-xs-4" onclick="window.location.href = '/view/html/goldCoin.html?type=5'">
+                <i class="aui-iconfont aui-icon-jb"></i>
+                <div class="aui-grid-label">金币</div>
+            </div>
+            <div class="aui-col-xs-4" onclick="window.location.href = '/view/html/more.html?type=6'">
+                <i class="aui-iconfont aui-icon-gd"></i>
+                <div class="aui-grid-label">更多</div>
+            </div>
+        </div>
+    </section>
+</article>
+    <div class="chat-btn" id="" onclick="notLogin('chatBtn')">
+        <i class="aui-iconfont aui-icon-xx"></i>
+    </div>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script src="../../js/publicSpace.js"></script>
+<script src="../../js/baidu.js"></script>
+<script type="text/javascript">
+    /* 判断后台token失效 */
+    isLoginFlag();
+    /* 有无聊天消息 */
+    /* 首页聊天按钮 */
+    setInterval(chatList,5000);
+    function chatList(){
+        var getUserInfo = JSON.parse(localStorage.getItem("setUserInfo"));
+        if(getUserInfo != null){
+            $.ajax({
+                url: "/getIndexMessage_NL",
+                type: "post",
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.num > 0){
+                        $(".chat-btn").append('<div class="aui-dot"></div>');
+                        $(".chat-btn").attr("id",data.lastOrderId);
+                    }
+                }
+            });
+        }
+    }
+    function isLoginFlag(){
+        $.ajax({
+            url: "/isLoginFlag_NL",
+            type: "post",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                if(data.code == 88888){
+                    localStorage.setItem("setUserInfo",null);
+                }
+            }
+        });
+    }
+    /*首页公告*/
+    $.ajax({
+        url: "/getIndexNotic_NL",
+        type: "post",
+        dataType: "json",
+        success: function(data) {
+            if(data.code == 1){
+                for(var i in data.data){
+                    var db=data.data[i];
+                    var notice=$('<li><a href="javascript:;">'+db.noticeTitle+'</a></li>');
+                    $("#noticelist").append(notice);
+                }	
+               	//console.log($("#noticelist").find("li").length)
+           	    if($("#noticelist").find("li").length>1){
+                   	setInterval('AutoScroll("#newsScroll")',5000)
+              	}
+            }
+        }
+    });
+    /*公告垂直滚动*/
+    function AutoScroll(obj){
+        var $liFist=$(obj).find("ul:first"),
+            scrollH=$(obj).height();
+        $liFist.animate({
+            marginTop:"-"+scrollH+"px"
+        },500,function(){
+            $(this).css({marginTop:"0px"}).find("li:first").appendTo(this);
+        });
+    }
+  
+
+</script>
+<script src="../../js/TouchSlide.1.1.js"></script>
+<script type="text/javascript">
+    $.ajax({/*焦点图图片加载*/
+        url: "/getIndexImage_NL",
+        type: "post",
+        dataType: "json",
+        success: function(data) {
+            if(data.code == 1){
+                console.log(data)
+                for(var i in data.data){
+                    var tp=data.data[i];
+                    var slideshow=$('<li><a href="'+tp.imgLink+'"><img src="http://imgcdn.3yx.com/'+tp.imgPath+'?imageView2/0/w/500/h/167"/></a></li>');
+                    $("#slidepic").append(slideshow);
+                }
+                if(data.data.length>1){//如果图片大于一张才启动轮播
+	                /*焦点图轮播*/
+	                TouchSlide({
+	                    slideCell:"#slideBox",
+	                    titCell:".hd ul",
+	                    mainCell:".bd ul",
+	                    effect:"leftLoop",
+	                    autoPage:true,
+	                    autoPlay:true
+	                });
+                }
+            }
+        }
+    });
+    
+    /*首页缓存所有区到本地*/
+    getGameArea();
+</script>
+</body>
+</html>

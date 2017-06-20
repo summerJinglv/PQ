@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="wap-font-scale" content="no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:;" id="typeReturn">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">熟练度</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body Fbtn-L-body">
+    <div class="type-detail">
+        <ul class="type-part1">
+            <li class="aui-margin-b-10">
+                <label class="fl">版本区服：</label>
+                <div class="form-row sel-row">
+                    <select class="type-select-area">
+                    </select>
+                    <select class="type-select-serve">
+                    </select>
+                </div>
+            </li>
+            <li class="aui-margin-b-10">
+                <label class="fl">服务类型：</label>
+                <div class="form-row">
+                    <div class="aui-list-item-input">
+                        <label class="aui-margin-r-15"><input class="aui-radio" type="radio" name="type" checked value="40">熟练度</label>
+                        <label><input class="aui-radio" type="radio" name="type" value="45">战力</label>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div id="type40" class="pr-type-content">
+            <ul class="type-part1">
+                <li class="aui-margin-b-10">
+                    <label class="fl">指定英雄：</label>
+                    <div class="form-row">
+                        <div class="select-hero-btn overlay" id="selectHeroBtn40" onclick="">选择英雄&gt;</div>
+                        <div class="aui-col-xs-12 overlay" id="dlHero40" style="display:none" onclick="">
+                            <!-- <div class="selected-hero">廉颇</div> -->
+                        </div>
+                    </div>
+                </li>
+                <li class="aui-margin-b-10" id="nowProficiency">
+                    <label class="fl">当前熟练度：</label>
+                    <div class="form-row2">
+                        <input type="number" id="dlNowProficiency" placeholder="必填">
+                    </div>
+                </li>
+                <li id="targetProficiency">
+                    <label class="fl" >目标熟练度：</label>
+                    <div class="form-row2">
+                        <input type="number" id="dlTargetProficiency" placeholder="必填">
+                    </div>
+                </li>
+            </ul>
+            <ul class="aui-list aui-margin-t-15">
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner grade-inner">
+                        <div class="aui-list-item-label wAuto fl">铭文等级：</div>
+                        <div class="aui-list-item-input grade-input fl">
+                            <input type="number" placeholder="如:120(非必填)" id="mwLv40">
+                        </div>
+                        <div id="classifyItem40" class="fr overlay" onclick="">
+                            <span>分类填写</span>
+                            <i class="aui-iconfont aui-icon-right"></i>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div id="type45" class="pr-type-content" style="display:none">
+            <ul class="type-part1">
+                <li class="aui-margin-b-10">
+                    <label class="fl">指定英雄：</label>
+                    <div class="form-row">
+                        <div class="select-hero-btn overlay" id="selectHeroBtn45" onclick="">选择英雄&gt;</div>
+                        <div class="aui-col-xs-12 overlay" id="dlHero45" style="display:none" onclick="">
+                            <!-- <div class="selected-hero">廉颇</div> -->
+                        </div>
+                    </div>
+                </li>
+                <li class="aui-margin-b-10" id="nowPower">
+                    <label class="fl">当前战力：</label>
+                    <div class="form-row">
+                        <input type="number" id="dlNowPower" placeholder="必填">
+                    </div>
+                </li>
+                <li id="targetPower">
+                    <label class="fl">目标战力：</label>
+                    <div class="form-row">
+                        <input type="number" id="dlTargetPower" placeholder="必填">
+                    </div>
+                </li>
+            </ul>
+            <ul class="aui-list aui-margin-t-15">
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner grade-inner">
+                        <div class="aui-list-item-label wAuto fl">铭文等级：</div>
+                        <div class="aui-list-item-input grade-input fl">
+                            <input type="number" placeholder="如:120(非必填)" id="mwLv45">
+                        </div>
+                        <div id="classifyItem45" class="fr overlay" onclick="">
+                            <span>分类填写</span>
+                            <i class="aui-iconfont aui-icon-right"></i>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="fix-note">更多代练要求，请与客服沟通！</div>
+    </div>
+</article>
+<footer class="aui-card-list-footer oD-footer aui-border-t"  onclick="notLogin(4)">
+    <div class="aui-btn aui-btn-basic aui-btn-block">咨询报价</div>
+</footer>
+<input type="hidden" id="type" value="">
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script src="../../js/publicSpace.js"></script>
+<script src="../../js/heroShow.js"></script>
+<script>
+	
+	
+	var classifyVal4v40=JSON.parse(sessionStorage.getItem("classifyVal4v40"));
+	if(classifyVal4v40!=null){//分类填写页面有值，但是用户又通过类型页面input框修改了值，相应的分类填写页面第一个不为空的分类值更新为用户更改后的值
+		$("#mwLv40").change(function(){
+			var changeVal=$(this).val();
+			var classifyVal=[classifyVal4v40.tank,classifyVal4v40.soldier,classifyVal4v40.assassin,classifyVal4v40.master,classifyVal4v40.shooter,classifyVal4v40.assist]
+			var hasVal=[];//classifyVal数组中不为空的元素的下标组成的新数组
+			for(var i in classifyVal){
+				if(classifyVal[i]!=""){
+					hasVal.push(i)
+				}
+			}
+			var first=hasVal[0];//第一个不为空的元素的下标
+			classifyVal[first]=changeVal;
+			classifyVal4v40 ={
+				"type":$("#type").val(),
+				"tank":classifyVal[0],
+				"soldier":classifyVal[1],
+				"assassin":classifyVal[2],
+				"master":classifyVal[3],
+				"shooter":classifyVal[4],
+				"assist":classifyVal[5]
+			};
+			sessionStorage.setItem("classifyVal4v40",JSON.stringify(classifyVal4v40));
+		})
+	}
+	
+	var classifyVal4v45=JSON.parse(sessionStorage.getItem("classifyVal4v45"));
+	if(classifyVal4v45!=null){//分类填写页面有值，但是用户又通过类型页面input框修改了值，相应的分类填写页面第一个不为空的分类值更新为用户更改后的值
+		$("#mwLv45").change(function(){
+			var changeVal=$(this).val();
+			var classifyVal=[classifyVal4v45.tank,classifyVal4v45.soldier,classifyVal4v45.assassin,classifyVal4v45.master,classifyVal4v45.shooter,classifyVal4v45.assist]
+			var hasVal=[];//classifyVal数组中不为空的元素的下标组成的新数组
+			for(var i in classifyVal){
+				if(classifyVal[i]!=""){
+					hasVal.push(i)
+				}
+			}
+			var first=hasVal[0];//第一个不为空的元素的下标
+			classifyVal[first]=changeVal;
+			classifyVal4v45 ={
+				"type":$("#type").val(),
+				"tank":classifyVal[0],
+				"soldier":classifyVal[1],
+				"assassin":classifyVal[2],
+				"master":classifyVal[3],
+				"shooter":classifyVal[4],
+				"assist":classifyVal[5]
+			};
+			sessionStorage.setItem("classifyVal4v45",JSON.stringify(classifyVal4v45));
+		})
+	}
+	
+    (function () {
+        setTimeout(loadData,500);
+        function loadData() {
+            try {
+                var getHasVal = JSON.parse(sessionStorage.getItem("setHasVal4"));
+                console.log(getHasVal);
+                if (getHasVal != null) {
+                    $("#type").val(getHasVal[0].type);
+                    $(".type-select-area").val(getHasVal[0].gameArea);
+                    $(".type-select-serve").val(getHasVal[0].gameServer);
+                    console.log(getHasVal[0].dlType)
+                    $("input[name='type'][value='" + getHasVal[0].dlType + "']")[0].checked = true;
+                    if (getHasVal[0].dlType == 40) {//熟练度
+                        $("#type40").show();
+                        $("#type45").hide();
+                        var selHeroes4v40 = JSON.parse(sessionStorage.getItem("selHeroes4v40"));
+                        if (selHeroes4v40 != null) {
+                            var showSelHeroesHtml40 = '<div class="selected-hero" id="' + selHeroes4v40.id + '">' + selHeroes4v40.name + '</div>';
+                            $("#dlHero40").html(showSelHeroesHtml40).show();
+                            $("#selectHeroBtn40").hide();
+                        } else {
+                            showSelHeroesHtml40 = "";
+                            $("#dlHero40").html(showSelHeroesHtml40).hide();
+                            $("#selectHeroBtn40").show();
+                        }
+                    } else if (getHasVal[0].dlType == 45) {//战力
+                        $("#type40").hide();
+                        $("#type45").show();
+                        var selHeroes4v45 = JSON.parse(sessionStorage.getItem("selHeroes4v45"));
+                        if (selHeroes4v45 != null) {
+                            var showSelHeroesHtml45 = '<div class="selected-hero" id="' + selHeroes4v45.id + '">' + selHeroes4v45.name + '</div>';
+                            $("#dlHero45").html(showSelHeroesHtml45).show();
+                            $("#selectHeroBtn45").hide();
+                        } else {
+                            showSelHeroesHtml45 = "";
+                            $("#dlHero45").html(showSelHeroesHtml45).hide();
+                            $("#selectHeroBtn45").show();
+                        }
+                    }
+                    $("#dlNowProficiency").val(getHasVal[0].dlNowProficiency);
+                    $("#dlTargetProficiency").val(getHasVal[0].dlTargetProficiency);
+                    $("#dlNowPower").val(getHasVal[0].dlNowPower);
+                    $("#dlTargetPower").val(getHasVal[0].dlTargetPower);
+                    $("#mwLv40").val(getHasVal[0].mwLv40);
+                    $("#mwLv45").val(getHasVal[0].mwLv45);
+                } else {
+                    $("#type40").show();
+                    $("#type45").hide();
+                }
+            } catch (err) {
+                console.log(err.message)
+            }
+            //获取铭文类型填写每个具体值，赋值给相应隐藏域
+            typeClassify(GetQueryString("type"));
+        }
+    })();
+
+
+</script>
+</html>

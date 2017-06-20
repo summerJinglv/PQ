@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+  <title>喷塔Q</title>
+</head>
+<body>
+  <!--头部-->
+  <header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+      <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">付款</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+      <span class="aui-iconfont aui-icon-home"></span>
+  	</a>
+  </header>
+  <article class="c_body Fbtn-L-body">
+    <div class="orderPay-info aui-border-b">
+      <div class="aui-margin-b-15">
+        <i class="state-icon state-icon-ok"></i>
+        <!--<i class="state-icon state-icon-wrong"></i>-->
+        提交订单完成，请尽快完成付款！
+      </div>
+      <div class="payM-row">
+        <label>待支付：</label>
+        <span id="orderTotalMoney"></span>
+        <input type="hidden" id="orderTotalMoneyvalue">
+      </div>
+    </div>
+    <div class="aui-card-list-content-padded aui-font-size-16">选择支付方式</div>
+    <ul class="aui-list aui-select-list paySel-list">
+      <li class="aui-list-item">
+        <div class="aui-list-item-inner">
+          <label><input class="aui-radio" type="radio" name="payWay" value="1" checked=""> 余额</label>
+          <span class="fr" id="userMoney"></span>
+        </div>
+      </li>
+      <li class="aui-list-item">
+        <div class="aui-list-item-inner">
+          <label><input class="aui-radio" type="radio" name="payWay" value="2"> 支付宝</label>
+        </div>
+      </li>
+    </ul>
+    <div class="input-box-max aui-padded-15" id="payPwdBox">
+      <input type="password" placeholder="请输入支付密码" id="payPwd" autofocus>
+    </div>
+  </article>
+ <footer class="aui-card-list-footer oD-footer aui-border-t">
+   <div class="aui-btn aui-btn-basic aui-btn-block" id="submitPay">确认支付</div>
+ </footer>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script>
+	function GetQueryString(name) {//页面跳转回来保存type值
+       var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+       var r = window.location.search.substr(1).match(reg);
+       if(r != null){
+           return r[2];
+       }
+    }
+    if($("input[name='payWay']:checked").val()==1){//余额
+    	$("#payPwdBox").fadeIn();
+    }else if($("input[name='payWay']:checked").val()==2){//支付宝
+    	$("#payPwdBox").hide();
+    }
+	$("input[name='payWay']").change(function(){//选择余额支付出现密码框
+		var checkVal=$(this).val();
+		if(checkVal==1){
+			$("#payPwdBox").fadeIn();
+			$("#payPwd").focus();
+		}else if(checkVal==2){
+			$("#payPwdBox").hide();
+		}
+	})
+	
+	$.ajax({//页面加载时读取余额和订单金额
+		url:'/toConfirmOrderPay',
+		type:'post',
+		data:{rowId:GetQueryString("rowId")},
+		dataType:"json",
+		success:function(data){
+			if(data.code==1){
+				$("#orderTotalMoney").html(data.data.orderTotalMoney);
+				$("#userMoney").html(data.data.userMoney);
+				$("#orderTotalMoneyvalue").val(data.data.orderTotalMoney);
+			}else if(data.code==88888){
+			    layer.msg("登录失效");
+                localStorage.setItem("setUserInfo",null);
+                setTimeout(function(){
+                    //iframe层-登录页
+                    loginLayerBox();
+                },1000)
+			}
+		}
+	})
+	function userMoneyPay(){//用余额支付
+		if($("#payPwd").val()==""||$("#payPwd").val()==null){
+			layer.msg("请输入密码！")
+		}else{
+			$.ajax({
+				url:'/toUserMoneyPay',
+				type:'post',
+				data:{rowId:GetQueryString("rowId"),payPwd:$("#payPwd").val(),payMoney:$("#orderTotalMoneyvalue").val()},
+				success:function(data){
+					console.log(data);
+					var data = JSON.parse(data);
+					if(data.code == "1"){
+						window.location.href="/view/html/orderPayResult.html?rowId="+GetQueryString("rowId");
+					}else if(data.code == "-10"){//账户余额不足
+                    	layer.msg(data.msg,{time:2000});
+                    	setTimeout("window.location.reload();", 1500);
+                    }else if(data.code=="-20"){//订单金额已被修改，请刷新页面重新支付
+                    	layer.msg(data.msg,{time:2000});
+                    	setTimeout("window.location.reload();", 1500);
+                    }else if(data.code=="-30"){//订单状态异常，请刷新页面
+                    	layer.msg(data.msg,{time:2000});
+                    }else if(data.opcode=="517"){//支付密码已锁定
+                    	layer.msg(data.msg,{time:2000});
+                    	$("#payPwd").val("");
+                    }else if(data.opcode=="516"){//支付密码未设定
+                    	layer.msg(data.msg+'<p class="aui-text-grey">2秒后自动跳转去设置支付密码</p>');
+                    	$("#payPwd").val("");
+                    	setTimeout(function(){
+                           window.location.href = '/view/html/changePayPwd.html?rowId='+GetQueryString("rowId")+"&page=orderPay";
+                       	},2000)
+                    }else if(data.opcode=="0"){//支付密码错误
+                    	layer.msg(data.msg,{time:2000});
+                    	$("#payPwd").val("");
+                    }else if(data.opcode=="515"){//支付密码异常
+                    	layer.msg(data.msg,{time:2000});
+                    	$("#payPwd").val("");
+                    }else if(data.code=="9999"){
+                    	layer.msg(data.msg,{time:2000});
+                    }else if(data.code==88888){
+                    	layer.msg("登录失效");
+	                    localStorage.setItem("setUserInfo",null);
+	                    setTimeout(function(){
+	                        //iframe层-登录页
+	                        loginLayerBox();
+	                    },1000)
+                    }
+				}
+			})
+		}
+	}
+	function userAlipayPay(){//用支付宝支付
+		$.ajax({
+			url:'/toReadyAlipayOrder',
+			type:'post',
+			data:{rowId:GetQueryString("rowId"),payMoney:$("#orderTotalMoneyvalue").val()},
+			success:function(data){
+				console.log(data)
+				var data=JSON.parse(data);
+				if(data.code=="1"){
+					window.location.href = '/toAlipayOrder?rowId=' + GetQueryString("rowId");
+				}else if(data.code=="-20"){//订单金额已被修改，请刷新页面重新支付
+                	layer.msg(data.msg,{time:2000});
+                	setTimeout("window.location.reload();", 1500);
+                }else if(data.code=="-30"){//订单状态异常，请刷新页面
+                	layer.msg(data.msg,{time:2000});
+                }else if(data.code=="-40"){//订单不存在
+                	layer.msg(data.msg,{time:2000});
+                }else if(data.code==88888){
+                	layer.msg("登录失效");
+                    localStorage.setItem("setUserInfo",null);
+                    setTimeout(function(){
+                        //iframe层-登录页
+                        loginLayerBox();
+                    },1000)
+                }
+			}
+		})
+		
+	}
+	
+	$("#submitPay").click(function(){//确认支付按钮点击事件
+		var payWayVal=$("input[name='payWay']:checked").val();
+		if(payWayVal==1){//余额支付
+			userMoneyPay();
+		}else if(payWayVal==2){//支付宝支付
+			userAlipayPay();
+		}
+	})
+</script>
+</body>
+</html>

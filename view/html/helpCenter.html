@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+  <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+  <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+    <span class="aui-iconfont aui-icon-left"></span>
+  </a>
+  <div class="aui-title">帮助中心</div>
+  <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+      <span class="aui-iconfont aui-icon-home"></span>
+  </a>
+</header>
+<article class="c_body">
+  <div class="type-detail aui-padded-0 hC-content">
+    <ul class="aui-list aui-margin-t-15">
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如何购买服务？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：通过首页进入所需服务的购买页面，输入服务内容，咨询客服报价后提交付款，完成购买。</li>	
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如何付款？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：您可使用账户余额、支付宝或银行卡支付。</li>	
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如果支付失败怎么办？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：支付失败后，您可重新操作付款；如果您的第三方支付账户已经被扣款，则扣款会返还至您的账户余额。</li>
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如果订单长时间未支付怎么办？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：若您的已报价订单在8小时内未支付，系统会自动取消该订单。</li>
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如何查看我的订单？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：您可在“个人中心 – 我的订单”页面查看所有订单。</li>
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如何找回登录密码和支付密码？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：您可在“个人中心 – 安全设置”中进行修改。</li>
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：我必须实名认证吗？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：根据国家相关法律法规，您在交易之前必须进行实名认证。</li>
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：商城没有完成我的订单怎么办？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：如果商城未完成您的订单，您可发起售后申请要求退款，退款金额不得大于订单金额。</li>
+      <li class="aui-list-item overlay" onclick="">
+        <div class="aui-list-item-inner">
+          <div class="aui-list-item-label">Q：如果退款申请被驳回怎么办？</div>
+          <i class="aui-iconfont aui-icon-down"></i>
+        </div>
+      </li>
+      <li class="help-item-detail">A：如您的退款申请被驳回，您可针对该订单发起投诉。</li>
+    </ul>
+  </div>
+</article>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script>
+	$(document).on("click",".aui-list-item",function(){
+		$(this).next(".help-item-detail").slideToggle("fast");
+		if(!$(this).find(".aui-icon-down").hasClass("up")){
+			$(this).find(".aui-icon-down").addClass("up")
+		}else{
+			$(this).find(".aui-icon-down").removeClass("up")
+		}
+	})
+	
+</script>
+</body>
+</html>

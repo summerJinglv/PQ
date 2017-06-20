@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn"  href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">添加账户</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body">
+    <section class="addAccount">
+        <div class="aui-padded-l-15">真实姓名： <i id="userRealName"></i></div>
+        <div class="input-box-max aui-padded-t-15" id="bankSelBox">
+            <div class="sel-placeholder">请选择开户行</div>
+            <select class="bankList" value="">
+                <option selected="selected" disabled="disabled" style="display:none" value="-1"></option>
+            </select>
+        </div>
+        <div class="input-box-max aui-padded-t-15">
+            <input id="bankAN" type="text" placeholder="请输入账号">
+        </div>
+        <div class="input-box-max aui-padded-t-15 aui-padded-b-15">
+            <input id="reBankAN" type="text" placeholder="请再输入一次">
+        </div>
+        <div  class="aui-padded-b-15 aui-padded-t-15">
+            <div class="aui-btn  aui-btn-block aui-btn-basic" id="addAccountBtn">添加账户</div>
+        </div>
+    </section>
+</article>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+    $("#bankSelBox select").change(function(){//隐藏select模拟placeholder文本
+        $(".sel-placeholder").hide();
+    })
+</script>
+<script>
+    (function(){
+        $.ajax({
+            url: "/getUserInfo",
+            type: "post",
+            dataType: "json",
+            success: function(data) {
+                if(data.code == 1){
+                    var db = data.user;
+                    console.log(db);
+                    $("#userRealName").html(db.userRealName)
+                }else if(data.code == 88888){
+                    layer.msg("登录失效");
+                    localStorage.setItem("setUserInfo",null);
+                    setTimeout(function(){
+                        //iframe层-登录页
+                        layer.open({
+                            type: 2,
+                            title: false,
+                            area: ['90%','286px'],
+                            shade: 0.5,
+                            content: ['/view/html/LoginRegister.html', 'no'],
+                            success:function(layero,index){
+                                parent.layer.iframeAuto(index);
+                            }
+                        });
+                    },1000)
+                }
+            }
+        });
+        /* 加载银行列表 */
+        $.ajax({
+            url: "/bankList",
+            type: "post",
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 1) {
+                    var bankList = JSON.parse(data.data);
+                    console.log(bankList);
+                    for(var i in bankList){
+                        var bankListCon = $('<option value="'+bankList[i].money_way_small_id+'">'+bankList[i].money_way_small_name+'</option>');
+                        $(".bankList").append(bankListCon);
+                    }
+                }
+            }
+        });
+        /* 点击添加提现账号 */
+        $("#addAccountBtn").click(setBankAccount);
+        function setBankAccount() {
+            var sendBankInfo = {bankId:$(".bankList :checked").val(),bankNo:$("#bankAN").val()};
+            console.log(sendBankInfo);
+            /* 非空格式判断 */
+            if($(".bankList :checked").val() == 0 || $(".bankList :checked").val() == 0){
+                layer.msg("请选择开户行");
+                return false;
+            }
+            if($("#bankAN").val() == null || $("#bankAN").val() == ""){
+                layer.msg("请输入银行卡号");
+                return false;
+            }
+            if($("#reBankAN").val() == null || $("#reBankAN").val() == ""){
+                layer.msg("请确认银行卡号");
+                return false;
+            }
+            if($("#bankAN").val() != $("#reBankAN").val()){
+                layer.msg("两次输入不一致");
+                return false;
+            }
+            $.ajax({
+                url: "/setBankAccount",
+                type: "post",
+                data:sendBankInfo,
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == 1) {
+                        layer.msg(data.msg);
+                        setTimeout(function(){
+                            window.location.href = "/view/html/wallet.html"
+                        },1000)
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        }
+    })();
+</script>
+</body>
+</html>

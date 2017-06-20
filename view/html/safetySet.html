@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">安全设置</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body">
+    <div class="type-detail saftySet-box">
+        <ul class="aui-list">
+            <!--<li class="aui-list-item">-->
+            <!--<div class="aui-list-item-inner">-->
+            <!--<div class="aui-list-item-label">修改登录密码</div>-->
+            <!--<i class="aui-iconfont aui-icon-right"></i>-->
+            <!--</div>-->
+            <!--</li>-->
+            <li class="aui-list-item" onclick="window.location.href = '/view/html/changePayPwd.html'">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label" id="payPwd" style="width:50%;">开启支付密码</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-list-item"  onclick="window.location.href = '/view/html/changePhone.html'">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">修改手机</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-list-item"  onclick="window.location.href = '/view/html/realName_ok.html'">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">实名认证</div>
+                    <div>
+                        <span class="aui-text-orange" id="realFlag">未认证</span>
+                        <i class="aui-iconfont aui-icon-right"></i>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</article>
+</body><script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+    (function(){
+        $.ajax({
+            url: "/getUserInfo",
+            type: "post",
+            dataType: "json",
+            success: function(data) {
+                if(data.code == 1){
+                    var db = data.user;
+                    if(db.payPasswordFlag == 0){
+                        $("#payPwd").html("开启支付密码");
+                    }else if(db.payPasswordFlag == 1){
+                        $("#payPwd").html("修改支付密码");
+                    }
+                    if(db.realFlag == 0){
+                        $("#realFlag").html("未认证");
+                    }else if(db.realFlag == 1){
+                        $("#realFlag").html("已认证");
+                    }
+                }else if(data.code == 88888){
+                    layer.msg("登录失效");
+                    localStorage.setItem("setUserInfo",null);
+                    setTimeout(function(){
+                        //iframe层-登录页
+                        layer.open({
+                            type: 2,
+                            title: false,
+                            area: ['90%','286px'],
+                            shade: 0.5,
+                            content: ['/view/html/LoginRegister.html', 'no'],
+                            success:function(layero,index){
+                                parent.layer.iframeAuto(index);
+                            }
+                        });
+                    },1000)
+                }
+            }
+        });
+    })();
+</script>
+</html>

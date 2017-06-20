@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <style>
+        .heroIntro{
+            padding: 8px;    margin-bottom: 8px;
+        }
+        .heroIntroTab{
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="aui-bg-white">
+<article class="c_body">
+    <!--头部-->
+    <header class="aui-bar aui-bar-nav">
+        <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+            <span class="aui-iconfont aui-icon-left"></span>
+        </a>
+        <div class="aui-title">英雄故事</div>
+    </header>
+    <div class="aui-col-xs-12 heroIntro">
+        <h1 class="heroIntroTab"></h1>
+    </div>
+    <div style="text-align: right;margin-right: 20px;">来源:网络</div>
+</article>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/fruitIndex.js"></script>
+<script>
+    $(function(){
+        // 获取头部的英雄值
+        var heroId = GetQueryString('heroId');
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r != null){
+                return r[2];
+            }
+        }
+        for(var i in fruitHero){
+            if(fruitHero[i][0].id == heroId){
+                $(".heroIntroTab").append(fruitHero[i][0].name);
+                $(".heroIntro").append(fruitHero[i][0].intro);
+            }
+        }
+    })
+</script>
+</html>

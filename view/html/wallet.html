@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">我的钱包</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body">
+    <div class="type-detail myWallet aui-padded-0">
+        <div class="wallet_bg aui-padded-15">
+            <div class="balance aui-font-size-14">余额：</div>
+            <div class="balance_money" id="userBalance"></div>
+            <div class="balance_btn_wk">
+                <div class="aui-btn aui-btn-primary bor_radius aui-btn-outlined aui-btn-sm" onclick="window.location.href='./withdrawCash.html'">提现</div>
+            </div>
+        </div>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-list-item" onclick="addAccount()">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">添加提现账户</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+        <div class="aui-card-list-content-padded aui-font-size-16">资金明细</div>
+        <ul class="aui-list aui-list-in" id="zjDetail">
+
+        </ul>
+        <div class="aui-card-list-footer aui-text-center" id="getMore">查看更多</div>
+    </div>
+</article>
+<input type="hidden" id="pageIndex" value="0">
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+    /* 加载提现金额 */
+    $.ajax({
+        url: "/getUserInfo",
+        type: "post",
+        dataType: "json",
+        success: function(data) {
+            if(data.code == 1){
+                var db = data.user;
+                $("#userBalance").html(db.userBalance)
+            }else if(data.code == 88888){
+                layer.msg("登录失效");
+                localStorage.setItem("setUserInfo",null);
+                setTimeout(function(){
+                    //iframe层-登录页
+                    layer.open({
+                        type: 2,
+                        title: false,
+                        area: ['90%','286px'],
+                        shade: 0.5,
+                        content: ['/view/html/LoginRegister.html', 'no'],
+                        success:function(layero,index){
+                            parent.layer.iframeAuto(index);
+                        }
+                    });
+                },1000)
+            }
+        }
+    });
+    /* 页面加载执行一次 */
+    getZjDetail();
+    /* 点击更多执行一次 */
+    $("#getMore").click(getZjDetail);
+    function getZjDetail(){
+        var pageIndex = $("#pageIndex").val();
+        $.ajax({
+            url: "/myWallet",
+            type: "post",
+            data:{pageIndex:pageIndex},
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 1) {
+                    var db = JSON.parse(data.data);
+                    var totolPage = Math.ceil((db.totolRows)/20);
+                    pageIndex++;
+                    $("#pageIndex").val(pageIndex);
+                    if(pageIndex > totolPage){
+                        $("#getMore").html("暂无更多数据");
+                    }else{
+                        var dbCon = JSON.parse(db.data);
+                        console.log(dbCon);
+                        for(var i in dbCon){
+                            var inOutFlag;
+                            var tradeTypeName;
+                            if(dbCon[i].inOutFlag == 1){
+                                inOutFlag = '-';
+                            }else if(dbCon[i].inOutFlag == 0){
+                                inOutFlag = '';
+                            }
+                            if((dbCon[i].relationOrderNo).substring(0,3) == "PTQ" || (dbCon[i].relationOrderNo).substring(0,2) == "TX"){
+                                tradeTypeName = dbCon[i].tradeTypeName;
+                            }else{
+                                tradeTypeName = "交易 (3yx)";
+                            }
+                            var zjDetail = $('<li class="aui-list-item">'+
+                                    '<div class="aui-list-item-inner">'+
+                                    '<div class="aui-list-item-title">'+tradeTypeName+'<p>'+dbCon[i].createTime+'</p></div>'+
+                                    '<div class="aui-list-item-right aui-font-size-16">'+inOutFlag+'￥'+dbCon[i].tradeMoney+'</div>'+
+                                    '</div>'+
+                                    '</li>');
+                            $("#zjDetail").append(zjDetail);
+                        }
+                    }
+                }else{
+                    layer.msg(data.msg);
+                }
+            }
+        });
+    }
+</script>
+<script>
+	function addAccount(){//添加账户判断是否实名认证
+	    $.ajax({
+           url: "/getUserInfo",
+           type: "post",
+           dataType: "json",
+           success: function(data) {
+           console.log(data);
+               if(data.code == 1){
+                   var userRealName = data.user.userRealName;
+                   console.log(userRealName);
+                   if(userRealName!=null){
+                   		window.location.href='/view/html/addAccount.html';
+                   }else{
+                   	    layer.msg("未实名认证"+'<p class="aui-text-grey">2秒后自动跳转去实名认证</p>')
+                   	    setTimeout(function(){
+                   	    	window.location.href='/view/html/realName_ok.html';
+                   	    },2000)
+                   }
+               }else if(data.code == 88888){
+                   layer.msg("登录失效");
+                   localStorage.setItem("setUserInfo",null);
+                   setTimeout(function(){
+                       //iframe层-登录页
+                       layer.open({
+                           type: 2,
+                           title: false,
+                           area: ['90%','286px'],
+                           shade: 0.5,
+                           content: ['/view/html/LoginRegister.html', 'no'],
+                           success:function(layero,index){
+                               parent.layer.iframeAuto(index);
+                           }
+                       });
+                   },1000)
+               }
+           }
+        });
+	}
+</script>
+</html>

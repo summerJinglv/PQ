@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">铭文分类</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+     <span class="aui-iconfont aui-icon-home"></span>
+ </a>
+</header>
+<article class="c_body Fbtn-L-body">
+    <div class="type-detail classify-main">
+        <ul class="aui-list aui-list-in">
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">坦克：</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" placeholder="如：120" id="tank">
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">战士：</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" placeholder="如：120" id="soldier">
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">刺客：</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" placeholder="如：120" id="assassin">
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">法师：</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" placeholder="如：120" id="master">
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">射手：</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" placeholder="如：120" id="shooter">
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">辅助：</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" placeholder="如：120" id="assist">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</article>
+<footer class="aui-card-list-footer oD-footer aui-border-t">
+    <div class="aui-btn aui-btn-basic aui-btn-block" onclick="classifyCookie()">保存</div>
+</footer>
+<input type="hidden" id="type" value="">
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/publicSpace.js"></script>
+<script>
+    /* 铭文等级只能为数字 */
+    $("#tank").bind('input change',notNull);
+    $("#soldier").bind('input change',notNull);
+    $("#assassin").bind('input change',notNull);
+    $("#master").bind('input change',notNull);
+    $("#shooter").bind('input change',notNull);
+    $("#assist").bind('input change',notNull);
+    function notNull(){
+        if($(this).val() != ""){
+            if(!(/^[1-9]\d*|0$/.test($(this).val()))){
+                layer.msg("铭文格式不正确");
+                $(this).val("");
+                return false;
+            }
+            if($(this).val() > 150){
+                layer.msg("铭文不能大于150");
+                $(this).val("");
+            }
+        }
+    }
+    
+    //不同入口的铭文填写显示上次输入
+    var type=GetQueryString("type");
+    var value=GetQueryString("value");
+    if(type==4){
+    	if(value==40){
+    		var classifyVal4v40 = JSON.parse(sessionStorage.getItem("classifyVal4v40"));
+    		if(classifyVal4v40!=null){
+				$("#tank").val(classifyVal4v40.tank);
+				$("#soldier").val(classifyVal4v40.soldier);
+				$("#assassin").val(classifyVal4v40.assassin);
+				$("#master").val(classifyVal4v40.master);
+				$("#shooter").val(classifyVal4v40.shooter);
+				$("#assist").val(classifyVal4v40.assist);
+    		}
+    	}else if(value==45){
+    		var classifyVal4v45 = JSON.parse(sessionStorage.getItem("classifyVal4v45"));
+    		if(classifyVal4v45!=null){
+				$("#tank").val(classifyVal4v45.tank);
+				$("#soldier").val(classifyVal4v45.soldier);
+				$("#assassin").val(classifyVal4v45.assassin);
+				$("#master").val(classifyVal4v45.master);
+				$("#shooter").val(classifyVal4v45.shooter);
+				$("#assist").val(classifyVal4v45.assist);
+    		}
+    	}
+    }else{
+    	var classifyVal = JSON.parse(sessionStorage.getItem("classifyVal"+type));
+    	if(classifyVal!=null){
+    		$("#tank").val(classifyVal.tank);
+			$("#soldier").val(classifyVal.soldier);
+			$("#assassin").val(classifyVal.assassin);
+			$("#master").val(classifyVal.master);
+			$("#shooter").val(classifyVal.shooter);
+			$("#assist").val(classifyVal.assist);
+    	}
+    }
+    
+    
+	function GetQueryString(name) {
+	    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+	    var r = window.location.search.substr(1).match(reg);
+	    if(r != null){
+	        return r[2];
+	    }
+	}
+</script>
+</body>
+</html>

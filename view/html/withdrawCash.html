@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="c_goBack aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">提现</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body Fbtn-L-body">
+    <div class="wC-main">
+        <ul class="aui-list aui-media-list aui-margin-t-15">
+            <li class="aui-list-item aui-list-item-middle aui-padded-r-15" id="showTxWay" onclick="addAccount()">
+                <div class="aui-media-list-item-inner">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-text aui-margin-b-5">
+                            <div class="aui-list-item-title aui-font-size-18 showTxWayName">请选择账户</div>
+                        </div>
+                        <div class="aui-list-item-text aui-text-grey showTxWay"></div>
+                    </div>
+                    <i class="aui-iconfont aui-icon-right" id="selectBtn"></i>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-media-list other-bank" style="display: none">
+			
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-padded-15 aui-padded-b-0">提现金额</li>
+            <li class="aui-list-item wC-form aui-padded-b-15 aui-padded-t-10">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">￥</div>
+                    <div class="aui-list-item-input">
+                        <input type="number" id="writePrice" placeholder="00.00" value="" autofocus>
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner" id="userBalance"></div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">支付密码 :</div>
+                    <div class="aui-list-item-input">
+                        <input type="password" id="writePayPwd" placeholder="请输入支付密码">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</article>
+<footer class="aui-card-list-footer oD-footer aui-border-t">
+    <div class="aui-btn aui-btn-basic aui-btn-block" id="affirmTx">提现</div>
+</footer>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+    /* 加载提现金额 */
+    $.ajax({
+        url: "/getUserInfo",
+        type: "post",
+        dataType: "json",
+        success: function(data) {
+            if(data.code == 1){
+                var db = data.user;
+                $("#userBalance").html("可用余额 : "+db.userBalance+" 元")
+            }else if(data.code == 88888){
+                layer.msg("登录失效");
+                localStorage.setItem("setUserInfo",null);
+                setTimeout(function(){
+                    //iframe层-登录页
+                    layer.open({
+                        type: 2,
+                        title: false,
+                        area: ['90%','286px'],
+                        shade: 0.5,
+                        content: ['/view/html/LoginRegister.html', 'no'],
+                        success:function(layero,index){
+                            parent.layer.iframeAuto(index);
+                        }
+                    });
+                },1000)
+            }
+        }
+    });
+    /* 加载所有的体现方式 */
+    $.ajax({
+        url: "/userBankList",
+        type: "post",
+        dataType: "json",
+        success: function (data) {
+            if (data.code == 1) {
+                var UBL = JSON.parse(data.data);
+                console.log(UBL);
+                if(UBL != "" || UBL != null){
+                    var defaultChecked;
+                    /* 移除链接地址 */
+                    $("#showTxWay").removeAttr("onclick");
+                    for(var i in UBL){
+                        /* 页面默认显示为支付宝 */
+                        if(UBL[i].MONEY_WAY_SMALL_ID == '10'){
+                            $(".showTxWayName").html(UBL[i].MONEY_WAY_SMALL_NAME);
+                            $(".showTxWayName").attr("id",UBL[i].MONEY_WAY_SMALL_ID);
+                            $(".showTxWay").html(UBL[i].ACCOUNT_NO);
+                            $(".showTxWay").attr("id",UBL[i].ROW_ID);
+                            defaultChecked = "checked";
+                        }else{
+                            defaultChecked = "";
+                        }
+                        var accountNo;
+                        /* 支付宝财付通等账号显示全部,其他需隐藏字段 */
+                        var mkoneyWaySmallId = UBL[i].MONEY_WAY_SMALL_ID;
+                        /* 用来显示选中的rowid */
+                        var ROW_ID = UBL[i].ROW_ID;
+                        if(mkoneyWaySmallId == '10' || mkoneyWaySmallId == '20' ){
+                            accountNo = UBL[i].ACCOUNT_NO;
+                        }else{
+                            accountNo = '**** **** **** '+UBL[i].ACCOUNT_NO.slice(-4);
+                        }
+                        var userAllBankCon = $('<li class="aui-list-item aui-list-item-middle aui-padded-r-15">'+
+                                '<div class="aui-media-list-item-inner">'+
+                                '<div class="aui-list-item-inner">'+
+                                '<div class="aui-list-item-text aui-margin-b-5">'+
+                                '<div class="aui-list-item-title aui-font-size-18" id="'+mkoneyWaySmallId+'">'+UBL[i].MONEY_WAY_SMALL_NAME+'</div>'+
+                                '</div>'+
+                                '<div class="aui-list-item-text aui-text-grey">'+accountNo+'</div>'+
+                                '</div>'+
+                                '<div class="aui-list-item-input">'+
+                                '<input class="aui-radio" value="'+ROW_ID+'" '+defaultChecked+' type="radio" name="type">'+
+                                '<input type="hidden" value="">'+
+                                '</div>'+
+                                '</div>'+
+                                '</li>');
+                        $(".other-bank").append(userAllBankCon);
+                    }
+                }
+            }
+        }
+    });
+    /* 当先显示的体现方式点击时 */
+    $("#showTxWay").click(allTxWay);
+    function allTxWay(){
+    	if($(".other-bank>li").length > 1){ //只有一个账户不显示下拉框
+	        if($(".other-bank").css("display") == "none"){
+                $("#selectBtn").removeClass("aui-icon-right").addClass("aui-icon-down");
+	            $(".other-bank").slideDown();
+	        }else{
+                $("#selectBtn").removeClass("aui-icon-down").addClass("aui-icon-right");
+	            $(".other-bank").slideUp();
+	        }
+    	}
+    }
+    /* 判断被选中状态的账户显示 */
+    $(".other-bank").on("click",".aui-radio", function() {
+        var bankWayChecked = $("input[name='type']:checked").val();
+        $(".other-bank").slideUp();
+        $.ajax({
+            url: "/userBankList",
+            type: "post",
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 1) {
+                    var UBL = JSON.parse(data.data);
+                    var accountNo;
+                    for(var i in UBL){
+                        /* 页面默认显示为支付宝 */
+                        if(UBL[i].ROW_ID == bankWayChecked){
+                            /* 银行显示屏蔽字段 */
+                            /* 支付宝财付通等账号显示全部,其他需隐藏字段 */
+                            var mkoneyWaySmallId = UBL[i].MONEY_WAY_SMALL_ID;
+                            if(mkoneyWaySmallId == '10' || mkoneyWaySmallId == '20' ){
+                                accountNo = UBL[i].ACCOUNT_NO;
+                            }else{
+                                accountNo = '**** **** **** '+UBL[i].ACCOUNT_NO.slice(-4);
+                            }
+                            $(".showTxWayName").html(UBL[i].MONEY_WAY_SMALL_NAME);
+                            $(".showTxWayName").attr("id",UBL[i].MONEY_WAY_SMALL_ID);
+                            $(".showTxWay").html(accountNo);
+                            $(".showTxWay").attr("id",UBL[i].ROW_ID);
+                        }
+                    }
+                }
+            }
+        });
+    });
+    /* 提现按钮点击时 */
+    $("#affirmTx").click(affirmTx);
+    function affirmTx() {
+        if($(".showTxWayName").html() == "请选择账户"){
+            layer.msg("请选择账户");
+            return false;
+        }
+        if($("#writePrice").val() == "" || $("#writePrice").val() == null){
+            layer.msg("请输入金额");
+            return false;
+        }
+        if($("#writePayPwd").val() == "" || $("#writePayPwd").val() == null){
+            layer.msg("请输入支付密码");
+            return false;
+        }
+        $.ajax({
+            url: "/drawCash",
+            type: "post",
+            data:{accountId:$(".showTxWay").attr("id"),payPassword:$("#writePayPwd").val(),withdrawMoney:$("#writePrice").val()},
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                if (data.code == 1) {
+                    layer.msg("提现成功");
+                    setTimeout(function(){
+                        window.location.href = "/view/html/wallet.html";
+                    },800)
+                }else{
+                    layer.msg(data.msg)
+                }
+            }
+        });
+    }
+</script>
+<script>
+	function addAccount(){//添加账户判断是否实名认证
+	    $.ajax({
+           url: "/getUserInfo",
+           type: "post",
+           dataType: "json",
+           success: function(data) {
+           console.log(data)
+               if(data.code == 1){
+                   var userRealName = data.user.userRealName;
+                   console.log(userRealName);
+                   if(userRealName!=null){
+                   		window.location.href='/view/html/addAccount.html';
+                   }else{
+                   	    layer.msg("未实名认证"+'<p class="aui-text-grey">2秒后自动跳转去实名认证</p>')
+                   	    setTimeout(function(){
+                   	    	window.location.href='/view/html/realName_ok.html';
+                   	    },2000)
+                   }
+               }else if(data.code == 88888){
+                   layer.msg("登录失效");
+                   localStorage.setItem("setUserInfo",null);
+                   setTimeout(function(){
+                       //iframe层-登录页
+                       layer.open({
+                           type: 2,
+                           title: false,
+                           area: ['90%','286px'],
+                           shade: 0.5,
+                           content: ['/view/html/LoginRegister.html', 'no'],
+                           success:function(layero,index){
+                               parent.layer.iframeAuto(index);
+                           }
+                       });
+                   },1000)
+               }
+           }
+        });
+	}
+</script>
+</html>

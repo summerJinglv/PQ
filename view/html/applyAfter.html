@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="c_goBack aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">申请售后</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body Fbtn-L-body">
+    <div class="type-detail aui-padded-0 aui-bg-white aui-border-b">
+        <ul class="type-part1 aui-padded-t-15 aui-padded-b-15">
+            <li class="aui-margin-b-10">
+                <label class="fl">售后方式：</label>
+                <div class="form-row">
+                    <div class="aui-list-item-input">
+                        <label class="aui-margin-r-15"><input class="aui-radio" type="radio" name="discussFlag" value="10" checked>退款</label>
+                    </div>
+                </div>
+            </li>
+            <li class="aui-margin-b-10">
+                <label class="fl">退款金额：</label>
+                <div class="form-row dan-row">
+                    <input class="inputAW-left" id="orderRefundFee" type="text"  placeholder="不可超过订单金额">
+                    <span class="dan-right">元</span>
+                </div>
+            </li>
+            <li class="aui-margin-b-10">
+                <label class="fl">售后原因：</label>
+                <div class="form-row">
+                    <textarea id="remark" placeholder="售后原因"></textarea>
+                </div>
+            </li>
+        </ul>
+    </div>
+</article>
+<footer class="aui-card-list-footer oD-footer aui-border-t">
+    <div class="aui-btn aui-btn-basic aui-btn-block" onclick="applySubmit()">提交</div>
+</footer>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script>
+	function GetQueryString(name) {
+	    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+	    var r = window.location.search.substr(1).match(reg);
+	    if(r != null){
+	        return r[2];
+	    }
+	}
+	
+	var rowId=GetQueryString("rowId");
+	function applySubmit(){//申请售后按钮点击事件
+		var postData={ 
+			discussType:50, 
+			discussFlag:$("input[name='discussFlag']:checked").val(),
+			remark:$("#remark").val(),
+		  	applyRefundFee:$("#orderRefundFee").val(), 
+		  	rowId:rowId 
+		  };
+		  
+		var checkMoney = /^[1-9]\d*$/;
+		if($("#orderRefundFee").val()==""|| $("#orderRefundFee").val()==null){
+			layer.msg("请输入退款金额！");
+			return false;
+		}else if( !checkMoney.test($("#orderRefundFee").val()) ){
+			layer.msg("请输入正确的金额格式");
+			$("#orderRefundFee").val("");
+			return false;
+		}else if($("#remark").val()==""|| $("#remark").val()==null){
+			layer.msg("请输入售后原因！");
+			return false;
+		}else{
+			$.ajax({
+				 url: "/lsj/toSalesServicePage",
+				 type: "post",
+	             data:postData,
+	             dataType: "json",
+	             success: function(data) {
+	              console.log(data)
+	             	if(data.opcode=="0"){
+	             		layer.msg(data.msg);
+	              		setTimeout(function(){
+	              			window.location.href="./myOrder.html"; 
+	              		},2000)
+	             	}else if(data.code==88888){
+	             		layer.msg("登录失效");
+	                    localStorage.setItem("setUserInfo",null);
+	                    setTimeout(function(){
+	                        //iframe层-登录页
+	                        loginLayerBox();
+	                    },1000)
+	             	}else{
+	             		layer.msg(data.msg);
+	             	}
+	             }
+			})
+		}
+		
+	} 
+
+</script>
+</html>

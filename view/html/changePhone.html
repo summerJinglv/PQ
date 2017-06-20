@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn"  href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">修改手机号</div>
+</header>
+<article class="c_body">
+    <section class="aui-content-padded"  id="alterSendPhone">
+        <div class="aui-padded-t-10 aui-padded-b-10"><strong>已发送验证码至手机： <i id="userPhone"></i></strong></div>
+        <div class="input-box-max aui-padded-b-15 aui-padded-t-15">
+            <input  type="text" id="getSmsCaptchaOld" placeholder="请输入验证码">
+        </div>
+        <div  class="aui-padded-b-15 aui-padded-t-15">
+            <div class="aui-btn aui-btn-basic aui-btn-block" id="nextHandle">下一步</div>
+        </div>
+    </section>
+    <section class="aui-content-padded" id="newSendPhone" style="display: none">
+        <div class="input-box-max aui-padded-t-15">
+            <input  type="text" id="getPhoneNew" placeholder="请输入新手机号">
+        </div>
+        <div class="code-box aui-padded-b-15 aui-padded-t-15">
+            <div class="aui-btn aui-btn-basic" id="smsCaptchaNew">获取验证码</div>
+            <div class="input-code">
+                <input  type="text" id="getSmsCaptchaNew" placeholder="请输验证码">
+            </div>
+        </div>
+        <div  class="aui-padded-b-15 aui-padded-t-15">
+            <div class="aui-btn aui-btn-basic aui-btn-block" id="saveNewPhone">确定</div>
+        </div>
+    </section>
+    <input type="hidden" id="smsUserPhoneOld">
+    <input type="hidden" id="saveSmsCaptchaOld">
+</article>
+</body><script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+    (function(){
+        $.ajax({
+            url: "/getUserInfo",
+            type: "post",
+            dataType: "json",
+            success: function(data) {
+                if(data.code == 1){
+                    var db = data.user;
+                    console.log(db);
+                    $("#userPhone").html(db.userPhone.substring(0, 5) + "****" + db.userPhone.substring(9, 11));
+                    $("#smsUserPhoneOld").val(db.userPhone);
+                    sendPhoneCode("old");
+                }else if(data.code == 88888){
+                    layer.msg("登录失效");
+                    localStorage.setItem("setUserInfo",null);
+                    setTimeout(function(){
+                        //iframe层-登录页
+                        layer.open({
+                            type: 2,
+                            title: false,
+                            area: ['90%','286px'],
+                            shade: 0.5,
+                            content: ['/view/html/LoginRegister.html', 'no'],
+                            success:function(layero,index){
+                                parent.layer.iframeAuto(index);
+                            }
+                        });
+                    },1000)
+                }
+            }
+        });
+        /* 点击下一步按钮 */
+        $("#nextHandle").click(nextHandle);
+        /* 新手机点击获取验证码 */
+        $("#smsCaptchaNew").click(function(){
+            sendPhoneCode("new");
+        });
+        /* 确定按钮点击 */
+        $("#saveNewPhone").click(savePhone);
+        function savePhone(){
+            /* 非空判断 */
+            if($("#getPhoneNew").val() == null || $("#getPhoneNew").val() == ""){
+                layer.msg("请输入新手机");
+                return false;
+            }
+            if(/^1[345678]\d{9}$/.test($("#getPhoneNew").val())){
+                layer.msg("手机号码输入有误");
+                return false;
+            }
+            if($("#getSmsCaptchaNew").val() == null || $("#getSmsCaptchaNew").val() == ""){
+                layer.msg("请输入验证码");
+                return false;
+            }
+            var sendData = {
+                oldMobile:$("#smsUserPhoneOld").val(),
+                oldSmsCaptcha:$("#saveSmsCaptchaOld").val(),
+                newMobile:$("#getPhoneNew").val(),
+                newSmsCaptcha:$("#getSmsCaptchaNew").val()
+            };
+            $.ajax({
+                url: "/changePhone",
+                type: "post",
+                data:sendData,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.code == 1){
+                        layer.msg("手机号码修改成功");
+                        setTimeout(function(){
+                            window.location.href = "/view/html/safetySet.html";
+                        },500)
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+        }
+        function nextHandle() {
+            $.ajax({
+                url: "/checkSms",
+                type: "post",
+                data:{sentType:40,mobile:$("#smsUserPhoneOld").val(),smsCaptcha:$("#getSmsCaptchaOld").val()},
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.code == 1){
+                        $("#saveSmsCaptchaOld").val($("#getSmsCaptchaOld").val());
+                        $("#alterSendPhone").hide();
+                        $("#newSendPhone").show();
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+        }
+        function sendPhoneCode(type) {
+            var listenUserPhone;
+            var num = 60;
+            if(type == "old"){
+                listenUserPhone = $("#smsUserPhoneOld").val();
+            }else if(type == "new"){
+                listenUserPhone = $("#getPhoneNew").val();
+            }
+            $.ajax({
+                url: "/sendPhoneCode_NL",
+                type: "post",
+                data:{sentType:40,mobile:listenUserPhone},
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.code == 1){
+                        layer.msg("发送成功");
+                        if(type == "new"){
+                            /* 开始倒计时 */
+                            time();
+                            function time() {
+                                if(num == 0){
+                                    $("#smsCaptchaNew").html("获取验证码").removeClass("aui-btn-disabled").removeAttr("disabled");
+                                    num = 60;
+                                }else{
+                                    $("#smsCaptchaNew").addClass("aui-btn-disabled").attr("disabled",true).html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+num+" s&nbsp;&nbsp;&nbsp;&nbsp;");
+                                    num--;
+                                    setTimeout(function(){
+                                        time();
+                                    }, 1000);
+                                }
+                            }
+                        }
+                    }else if(data.code == 514){
+                        layer.msg("已注册账号不允许修改");
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+        }
+    })();
+</script>
+</html>

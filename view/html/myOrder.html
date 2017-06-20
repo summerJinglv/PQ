@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="wap-font-scale" content="no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">我的订单</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<div class="aui-tab my-tab">
+    <div id="allOrders" class="aui-tab-item aui-active" ><a href="javascript:;">全部</a></div>
+    <div id="wPay"  class="aui-tab-item"><a href="javascript:;">待付款</a></div>
+    <div id="jxz"  class="aui-tab-item"><a href="javascript:;">进行中</a></div>
+    <div id="finish"  class="aui-tab-item"><a href="javascript:;">已完成</a></div>
+    <div id="shouhou" class="aui-tab-item"><a href="javascript:;">售后</a></div>
+</div>
+<article class="c_body myOrder-body">
+    <div  id="moreOrderCon">
+
+    </div>
+    <input type="hidden" id="pageIndex" name="pageIndex" value="0">
+    <input type="hidden" id="maxPage" name="maxPage" value="">
+    <input type="hidden" id="orderState" name="orderState" value="0">
+    <div id="moreList" class="aui-card-list-footer aui-text-center" onclick="loadingMoreList()">点击加载更多</div>
+</article>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script>
+    $(function(){
+        loadingList('','1');
+    });
+    /* 导航栏 */
+    $(".my-tab").children().click(function(){
+        $(this).addClass("aui-active").siblings().removeClass("aui-active");
+        if($(this).children().html() == "全部"){
+            $("#allOrders").removeAttr("onclick");
+            loadingList('',1);
+            $("#wPay").attr('onclick',"loadingList('wPay',1)");
+            $("#jxz").attr('onclick',"loadingList('jxz',1)");
+            $("#finish").attr('onclick',"loadingList('finish',1)");
+            $("#shouhou").attr('onclick',"loadingList('shouhou',1)");
+            $("#moreList").attr('onclick',"loadingMoreList()");
+        }else if($(this).children().html() == "待付款"){
+            $("#wPay").removeAttr("onclick");
+            loadingList('wPay',1);
+            $("#allOrders").attr('onclick',"loadingList('',1)");
+            $("#jxz").attr('onclick',"loadingList('jxz',1)");
+            $("#finish").attr('onclick',"loadingList('finish',1)");
+            $("#shouhou").attr('onclick',"loadingList('shouhou',1)");
+            $("#moreList").attr('onclick',"loadingMoreList('wPay')");
+        }else if($(this).children().html() == "进行中"){
+            $("#jxz").removeAttr("onclick");
+            loadingList('jxz',1);
+            $("#allOrders").attr('onclick',"loadingList('',1)");
+            $("#wPay").attr('onclick',"loadingList('wPay',1)");
+            $("#finish").attr('onclick',"loadingList('finish',1)");
+            $("#shouhou").attr('onclick',"loadingList('shouhou',1)");
+            $("#moreList").attr('onclick',"loadingMoreList('finish')");
+        }else if($(this).children().html() == "已完成"){
+            $("#finish").removeAttr("onclick");
+            loadingList('finish',1);
+            $("#allOrders").attr('onclick',"loadingList('',1)");
+            $("#jxz").attr('onclick',"loadingList('jxz',1)");
+            $("#wPay").attr('onclick',"loadingList('wPay',1)");
+            $("#shouhou").attr('onclick',"loadingList('shouhou',1)");
+            $("#moreList").attr('onclick',"loadingMoreList('finish')");
+        }else if($(this).children().html() == "售后"){
+            $("#shouhou").removeAttr("onclick");
+            loadingList('shouhou',1);
+            $("#allOrders").attr('onclick',"loadingList('',1)");
+            $("#jxz").attr('onclick',"loadingList('jxz',1)");
+            $("#finish").attr('onclick',"loadingList('finish',1)");
+            $("#wPay").attr('onclick',"loadingList('wPay',1)");
+            $("#moreList").attr('onclick',"loadingMoreList('shouhou')");
+        }else{
+            console.log($(this).children().html());
+        }
+    });
+
+    function loadingList(orderState,pageIndex){
+        $("#moreOrderCon").html(" ");
+        listAjax(orderState,pageIndex);
+    }
+
+    //点击更多
+    function loadingMoreList(orderState){
+        var pageIndex = $("#pageIndex").val();
+        listAjax(orderState,pageIndex);
+    }
+
+    function listAjax(orderState,pageIndex){
+        $.ajax({
+            url: "/lsj/getAllOrderList",
+            type: "post",
+            data:{userId:"601",pageIndex:pageIndex,orderState:(orderState == null?"":orderState)},
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                if(data.opcode == 0){
+                    var db = data.result.orders;
+                    var totalPage = data.result.totalPage;
+                    $("#maxPage").val(totalPage);
+                    $("#page").val(totalPage);
+                    $("#pageIndex").val(data.result.pageIndex);
+                    if(db.length >= 10){
+                        $("#moreList").show();
+                    }else{
+                        $("#moreList").hide();
+                    }
+                    if(pageIndex > totalPage ){
+                        $("#moreList").html("暂无更多数据");
+                    }else{
+                        $("#moreList").html("点击加载更多");
+                        for(var i in db){
+                            var fdOrderState;
+                            var fdOrderStateBtn1;
+                            var fdOrderStateBtn2;
+                            $("#rowId").val(db[i].rowId);
+                            if(db[i].fdOrderState == 10){
+                                fdOrderState = "待付款";
+                                fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined aui-margin-r-10" onclick="cancelBtn('+db[i].rowId+')">取消</div>';
+                                fdOrderStateBtn2 = '<div class="aui-btn aui-btn-outlined" onclick="goPay('+db[i].rowId+')" >付款</div>';
+                            }else if(db[i].fdOrderState == 20){
+                                fdOrderState = "进行中";
+                                if(db[i].shNum == 0) { //未售后
+                                    fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/applyAfter.html?rowId='+db[i].rowId+'\'">申请售后</div>';
+                                    fdOrderStateBtn2 = "";
+                                }else if(db[i].tsNum==0){ //未投诉
+                                    fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/complaint.html?rowId='+db[i].rowId+'\'">投诉</div>';
+                                    fdOrderStateBtn2 = "";
+                                }else{
+                                    fdOrderStateBtn1 = "";
+                                    fdOrderStateBtn2 = "";
+                                }
+                            }else if(db[i].fdOrderState == 30){
+                                fdOrderState = "待验收";
+                                fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined aui-margin-r-10" onclick="ysBtn('+db[i].rowId+')">验收</div>';
+                                if(db[i].shNum==0){ //未售后
+		                        	fdOrderStateBtn2 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/applyAfter.html?rowId='+db[i].rowId+'\'">申请售后</div>';
+		                    	}else if(db[i].tsNum==0){ //未投诉
+		                        	fdOrderStateBtn2 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/complaint.html?rowId='+db[i].rowId+'\'">投诉</div>';
+		                   		}else{
+                                    fdOrderStateBtn2 = '';
+                                }
+                            }else if(db[i].fdOrderState == 40){
+                                fdOrderState = "已完成";
+                                if(db[i].exceedHour == 1){
+                                    fdOrderStateBtn1 = '';
+                                    fdOrderStateBtn2 = '';
+                                }else{
+                                    if(db[i].shNum==0){ //售后处理
+                                        fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/applyAfter.html?rowId='+db[i].rowId+'\'">申请售后</div>';
+                                    }else if(db[i].tsNum==0){ //投诉处理
+                                        fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/complaint.html?rowId='+db[i].rowId+'\'">投诉</div>';
+                                    }else{
+                                        fdOrderStateBtn1 = '';
+                                    }
+                                    fdOrderStateBtn2 = "";
+                                }
+                            }else if(db[i].fdOrderState == 50){
+                                fdOrderState = "售后中";
+                                fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined aui-margin-r-10" onclick="window.location.href = \'/view/html/complaint.html?rowId='+db[i].rowId+'\'">投诉</div>';
+                                fdOrderStateBtn2 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/applyAfterProgress.html?rowId='+db[i].rowId+'\'">查看处理进度</div>';
+                            }else if(db[i].fdOrderState == 60 || db[i].fdOrderState == 65){
+                                fdOrderState = "投诉中";
+                                fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined" onclick="window.location.href = \'/view/html/complaintProgress.html?rowId='+db[i].rowId+'\'">查看处理进度</div>';
+                                fdOrderStateBtn2 = "";
+                            }else if(db[i].fdOrderState == 70){
+                                fdOrderState = "售后已处理";
+                                if(db[i].tsNum == 0){
+                                	fdOrderStateBtn1 = '<div class="aui-btn aui-btn-outlined aui-margin-r-10" onclick="window.location.href = \'/view/html/complaint.html?rowId='+db[i].rowId+'\'">投诉</div>';
+                                }else{
+                                	fdOrderStateBtn1 = "";
+                                }
+                                fdOrderStateBtn2 = "";
+                            }else if(db[i].fdOrderState == 80){
+                                fdOrderState = "投诉已处理";
+                                fdOrderStateBtn1 = "";
+                                fdOrderStateBtn2 = "";
+                            }else if(db[i].fdOrderState == -1){
+                                fdOrderState = "已取消";
+                                fdOrderStateBtn1 = "";
+                                fdOrderStateBtn2 = "";
+                            }
+                            var moreOrderCon = $('<section class="aui-content myOrder-list" >'+
+                                    '<div class="aui-card-list  aui-border" id="'+db[i].rowId+'">'+
+                                    '<div class="order-tit" onclick="window.location.href =\'/view/html/orderDetail.html?rowId='+db[i].rowId+'\'">'+
+                                    '<div class="aui-font-size-14">'+db[i].gameName+' '+db[i].dlTypeName+'</div>'+
+                                    '<span class="aui-text-orange">'+fdOrderState+'</span>'+
+                                    '</div>'+
+                                    '<div class="aui-card-list-header aui-card-list-user clear-fix"  onclick="window.location.href =\'/view/html/orderDetail.html?rowId='+db[i].rowId+'\'">'+
+                                    '<div class="mO-list-text clear-fix">'+
+                                    '<div class="mO-list-middle">'+
+                                    '<div>'+db[i].title+'</div>'+
+                                    '<div>代练时长：'+db[i].dlHour+'小时</div>'+
+                                    '</div>'+
+                                    '<div class="mO-list-right">'+
+                                    '<div class="aui-font-size-18">￥'+db[i].orderSumFee+'</div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="aui-card-list-footer">'+
+                                    '<div></div>'+
+                                    '<div>'+
+                                    ''+fdOrderStateBtn1+''+
+                                    ''+fdOrderStateBtn2+''+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</section>');
+                             $("#moreOrderCon").append(moreOrderCon);
+                        }
+                    }
+                }else if(data.code == 88888){
+                    layer.msg("登录失效");
+                    localStorage.setItem("setUserInfo",null);
+                    setTimeout(function(){
+                        //iframe层-登录页
+                      	loginLayerBox();
+                    },1000)
+                }
+            }
+        });
+    }
+
+    function goPay(rowId){ //付款按钮点击事件
+        $.ajax({
+            url:'/lsj/checkInfo',
+            type:'post',
+            data:{rowId:rowId},
+            success:function(data){
+                data=JSON.parse(data);
+                console.log(data);
+                if(data.opcode==0){ //跳入确认订单页面
+                    window.location.href="/view/html/confirmOrder.html?rowId="+rowId;
+                }else if(data.opcode==1){ //跳入订单支付页面
+                    window.location.href="/view/html/orderPay.html?rowId="+rowId;
+                }else if(data.opcode == -1){ //跳入订单详情页
+                    window.location.href="/view/html/orderDetail.html?rowId="+rowId;
+                }
+            }
+        })
+    }
+
+    function ysBtn(rowId){//订单验收按钮点击事件
+        layer.open({
+            type:1,
+            title:'订单验收',
+            content:'<div class="aui-padded-15"><div class=" clear-fix"><label class="fl">支付密码：</label><div class="fl"><input id="payPwd" type="password" class="input-init-s input-border"></div></div><p class="aui-padded-t-15 aui-font-size-12">确认验收后，钱款直接进入对方账户，请谨慎操作！</p></div>',
+            btn:["取消","确认"],
+            btn2:function(index,layero){
+                if($("#payPwd").val()==''||$("#payPwd").val()==null){
+                    layer.msg('请输入支付密码',{time:2000});
+                    return false;
+                }else{
+                    $.ajax({
+                        url: "/lsj/checkPayPwd",
+                        type: "post",
+                        data:{payPwd:$("#payPwd").val()},
+                        dataType: "json",
+                        success: function(data) {
+                            console.log(data)
+                            if(data.opcode=="1"){
+                                $.ajax({
+                                    url:"/lsj/finishOrder",
+                                    type:"post",
+                                    data:{rowId:rowId},
+                                    success:function(data){
+                                        var data=JSON.parse(data);
+                                        console.log(data)
+                                        if(data.opcode=="0"){
+                                            layer.close(index);
+                                            layer.msg(data.msg,{time:2000});
+                                            setTimeout(function(){
+                                                window.location.reload();
+                                            },2000)
+                                        }else if(data.code == "88888"){
+                                            layer.msg("登录失效");
+                                            layer.close(index);
+                                            localStorage.setItem("setUserInfo",null);
+                                            setTimeout(function(){
+                                                //iframe层-登录页
+                                                loginLayerBox();
+                                            },1000)
+
+                                        }
+                                    }
+                                })
+                            }else if(data.opcode=="516"){//支付密码未设定
+                                layer.msg(data.msg+'<p class="aui-text-grey">2秒后自动跳转去设置支付密码</p>');
+                                $("#payPwd").val("");
+                                layer.close(index);
+                                setTimeout(function(){
+                                    window.location.href = "/view/html/changePayPwd.html?rowId="+rowId+"&page=orderDetail";
+                                },2000)
+                            }else if(data.opcode=="0"){//支付密码错误
+                                layer.msg(data.msg+"！剩余"+data.restTimes+"次机会",{time:2000});
+                                $("#payPwd").val("");
+                            }else if(data.opcode=="517"){//支付密码已锁定
+                                layer.msg(data.msg,{time:2000});
+                                $("#payPwd").val("");
+                                parent.layer.close(index);
+                            }else if(data.opcode=="515"){//支付密码异常
+                                layer.msg(data.msg,{time:2000});
+                                $("#payPwd").val("");
+                                layer.close(index);
+                            }else if(data.code=="9999"){//服务器异常
+                                layer.msg(data.msg,{time:2000});
+                                parent.layer.close(index);
+                            }else if(data.code == "88888"){
+                                layer.msg("登录失效");
+                                layer.close(index);
+                                localStorage.setItem("setUserInfo",null);
+                                setTimeout(function(){
+                                    //iframe层-登录页
+                                   loginLayerBox();
+                                },1000)
+                            }
+
+                        }
+                    })
+                    return false;
+                }
+            }
+        })
+    }
+
+    function cancelBtn(rowId){//取消按钮点击事件
+        layer.open({
+            type:1,
+            title:false,
+            closeBtn: false,
+            content:'<div class="aui-padded-15 aui-text-center"><div class="aui-margin-t-15">订单取消后不可恢复</div><div>是否取消？</div></div>',
+            area: ['260px'],
+            btn:["否","是"],
+            btn2:function(index){
+                $.ajax({
+                    url: "/lsj/cancleOrder",
+                    type: "post",
+                    data:{rowId:rowId},
+                    dataType: "json",
+                    success: function(data) {
+                        console.log(data)
+                        if(data.opcode=="0"){
+                            layer.msg(data.msg);
+                            setTimeout(function(){
+                                window.location.reload();
+                            },2000)
+                        }else if(data.code == 88888){
+                            layer.msg("登录失效");
+                            parent.layer.close(index);
+                            localStorage.setItem("setUserInfo",null);
+                            setTimeout(function(){
+                                //iframe层-登录页
+                            	loginLayerBox();
+                            },1000)
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+</script>
+</html>

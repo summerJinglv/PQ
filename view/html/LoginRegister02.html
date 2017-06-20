@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html style=" -webkit-text-size-adjust: 100%; text-size-adjust: 100%;  height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>登录/注册</title>
+</head>
+<body class="login-body">
+<article class="login-wrap">
+    <div class="c_close overlay" id="hClose" click="">
+        <i class="aui-iconfont aui-icon-close"></i>
+    </div>
+    <section class="c_lrBox">
+        <!-- titleTab111-->
+        <div class="c_lrBoxTitle">登录 喷塔Q</div>
+        <!-- inputBox -->
+        <!-- message -->
+        <div id="c_message">
+            <ul class="c_lrBoxCon">
+                <li id="yzmLogin" class="clear-fix" style="border-bottom: 1px solid #eee;">
+                    <i class="aui-iconfont aui-icon-mobile fl c_phoneIcon"></i>
+                    <input class="c_input fl" type="text" name="userPhone" maxlength="11" id="userPhone" placeholder="请输入手机号">
+                </li>
+                <li class="codeLog-box">
+                    <div class="c_registerShow clear-fix">
+                        <i class="aui-iconfont aui-icon-lock fl c_phoneIcon"></i>
+                        <input type="text" name="userCode" id="userCode" placeholder="请输入短信验证码">
+                        <i class="c_icon"></i>
+                        <button class="aui-btn-disabled" disabled name="getCode" id="getCode" value="获取验证码">获取验证码</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!-- 3YX -->
+        <div id="c_3yx" style="display: none;">
+            <ul class="c_lrBoxCon">
+                <li id="login3yx" class="clear-fix" style="border-bottom: 1px solid #eee;">
+                    <i class="aui-iconfont aui-icon-mobile fl c_phoneIcon"></i>
+                    <input class="c_input" type="text" name="userName" id="userName" placeholder="请输入账号">
+                </li>
+                <li class="c_LoginShow clear-fix">
+                    <i class="aui-iconfont aui-icon-lock fl c_phoneIcon"></i>
+                    <input class="c_input" type="password" name="userPassword" id="userPassword" placeholder="请输入密码">
+                </li>
+            </ul>
+        </div>
+        <div>
+            <span class="c_tips">未注册手机将自动创建新账号</span>
+        </div>
+        <!-- loginBtn -->
+        <div>
+            <button class="aui-btn aui-btn-basic aui-btn-block" name="login" id="login" value="登&nbsp;&nbsp;录">登&nbsp;&nbsp;录</button>
+        </div>
+        <!-- change -->
+        <div class="c_lrBoxTab">
+            <a href="javascript:;" id="c_lrBoxTab" class="c_117ACB">账号密码登录</a>
+            <input type="hidden" id="loginState" value="0">
+            <input type="hidden" id="loginNeedImg" value="0">
+            <input type="hidden" id="threeFour" value="0">
+        </div>
+        <!-- 图片验证码 -->
+        <div class="c_imgCode" style="display: none;">
+            <div class="c_imgCodeTitle">输入图片中的字符</div>
+            <div class="c_imgCodeImg">
+                <img id="imgCodePic" alt="点击刷新">
+            </div>
+            <div class="c_imgCodeInput">
+                <input type="text" name="imgCode" id="imgCode" placeholder="请输入图片验证码" autofocus>
+            </div>
+        </div>
+        <input type="hidden" name="saveImgCode" id="saveImgCode">
+    </section>
+    <!-- agreement -->
+    <div class="c_lrBoxXY">
+        <label>登录即同意</label><a class="c_117ACB overlay" id="protocol" onclick="">《商城条款》</a>和<a class="c_117ACB overlay" id="privacyPolicy" onclick="">《隐私政策》</a>
+    </div>
+</article>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/loginRegister.js"></script>
+<script>
+	/* $(window).resize(function(){
+		$(".login-wrap").css({minHeight:$(window).height(),position:"relative"});
+	});*/
+		$(".login-wrap").css({minHeight:$(window).height()}); 
+</script>
+</html>

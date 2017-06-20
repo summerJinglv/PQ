@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn"  href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title" id="openOrchange">开启支付密码</div>
+</header>
+<article class="c_body">
+    <section class="aui-content-padded" id="paySendPhone">
+        <div class="aui-padded-t-10 aui-padded-b-10"><strong>已发送验证码至手机： <i id="userPhone"></i></strong></div>
+        <div class="input-box-max aui-padded-b-15 aui-padded-t-15">
+            <input  type="text" id="getPayCode" placeholder="请输入验证码">
+        </div>
+        <div  class="aui-padded-b-15 aui-padded-t-15">
+            <div class="aui-btn aui-btn-basic aui-btn-block" id="nextHandle">下一步</div>
+        </div>
+    </section>
+    <section class="aui-content-padded" id="payPwdBox" style="display: none">
+    <div class="input-box-max aui-padded-t-15">
+        <input  type="password" id="writePayPwd" placeholder="请输入新密码">
+    </div>
+    <div class="input-box-max aui-padded-t-15 aui-padded-b-15">
+        <input  type="password" id="writePayPwdAgain" placeholder="请再次确认新密码">
+    </div>
+    <div  class="aui-padded-b-15 aui-padded-t-15">
+        <div class="aui-btn aui-btn-basic aui-btn-block" id="savePayPwd">确定</div>
+    </div>
+</section>
+</article>
+<input type="hidden" id="smsUserPhone">
+<input type="hidden" id="saveSmsCaptcha">
+<input type="hidden" id="sentType">
+</body>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script>
+    (function(){
+        $.ajax({
+            url: "/getUserInfo",
+            type: "post",
+            dataType: "json",
+            success: function(data) {
+                if(data.code == 1){
+                    var db = data.user;
+                    console.log(db);
+                    if(db.payPasswordFlag == 0){
+                        $("#openOrchange").html("开启支付密码");
+                        $("#sentType").val("80");
+                    }else if(db.payPasswordFlag == 1){
+                        $("#openOrchange").html("修改支付密码");
+                        $("#sentType").val("50");
+                    }
+                    $("#userPhone").html(db.userPhone.substring(0, 5) + "****" + db.userPhone.substring(9, 11));
+                    $("#smsUserPhone").val(db.userPhone);
+                    sendPhoneCode();
+                }else if(data.code == 88888){
+                    layer.msg("登录失效");
+                    localStorage.setItem("setUserInfo",null);
+                    setTimeout(function(){
+                        //iframe层-登录页
+                        layer.open({
+                            type: 2,
+                            title: false,
+                            area: ['90%','286px'],
+                            shade: 0.5,
+                            content: ['/view/html/LoginRegister.html', 'no'],
+                            success:function(layero,index){
+                                parent.layer.iframeAuto(index);
+                            }
+                        });
+                    },1000)
+                }
+            }
+        });
+        /* 点击下一步按钮 */
+        $("#nextHandle").click(nextHandle);
+        /* 确定按钮点击 */
+        $("#savePayPwd").click(savePayPwd);
+        function savePayPwd(){
+            /* 非空判断 */
+            if($("#writePayPwd").val() == null || $("#writePayPwd").val() == ""){
+                layer.msg("请输入支付密码");
+                return false;
+            }
+            if($("#writePayPwdAgain").val() == null || $("#writePayPwdAgain").val() == ""){
+                layer.msg("请确认支付密码");
+                return false;
+            }
+            if($("#writePayPwdAgain").val() != $("#writePayPwd").val()){
+                layer.msg("两次密码不一致");
+                return false;
+            }
+            var sendData = {sentType:$("#sentType").val(),payPassword:$("#writePayPwd").val(),mobile:$("#smsUserPhone").val(),smsCaptcha:$("#saveSmsCaptcha").val()};
+            $.ajax({
+                url: "/changePayPassword",
+                type: "post",
+                data:sendData,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.code == 1){
+                        layer.msg("支付密码设置成功");
+                        setTimeout(function(){
+                        	if(typeof(GetQueryString("rowId"))=="undefined"){
+                            	window.location.href = "/view/html/safetySet.html";
+                        	}else{
+                        		if(GetQueryString("page")=="orderPay"){
+                        			window.location.href = "/view/html/orderPay.html?rowId="+GetQueryString("rowId");
+                        		}else if(GetQueryString("page")=="orderDetail"){
+                        			window.location.href = "/view/html/orderDetail.html?rowId="+GetQueryString("rowId");
+                        		}
+                        	}
+                        },500)
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+        }
+        function nextHandle() {
+            $.ajax({
+                url: "/checkSms",
+                type: "post",
+                data:{sentType:$("#sentType").val(),mobile:$("#smsUserPhone").val(),smsCaptcha:$("#getPayCode").val()},
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.code == 1){
+                        layer.msg("短信验证码正确");
+                        $("#saveSmsCaptcha").val($("#getPayCode").val());
+                        setTimeout(function(){
+                            $("#paySendPhone").hide();
+                            $("#payPwdBox").show();
+                        },500)
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+        }
+        function sendPhoneCode() {
+            $.ajax({
+                url: "/sendPhoneCode_NL",
+                type: "post",
+                data:{sentType:$("#sentType").val(),mobile:$("#smsUserPhone").val()},
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    if(data.code == 1){
+                        layer.msg("发送成功");
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                }
+            })
+        }
+    })();
+    
+    function GetQueryString(name) {
+       var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+       var r = window.location.search.substr(1).match(reg);
+       if(r != null){
+           return r[2];
+       }
+    }
+</script>
+</html>

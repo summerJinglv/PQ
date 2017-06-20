@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="page-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/index_chat.css" />
+    <title>喷塔Q</title>
+</head>
+<body>
+<!--头部-->
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" href="javascript:history.go(-1);">
+        <span class="aui-iconfont aui-icon-left"></span>
+    </a>
+    <div class="aui-title">我</div>
+    <a class="aui-pull-right aui-btn" href="/view/html/index.html">
+        <span class="aui-iconfont aui-icon-home"></span>
+    </a>
+</header>
+<article class="c_body">
+    <div class="type-detail aui-padded-0">
+        <div class="userInfo-box">
+            <div class="uC-pic" onclick="notLogin()">
+                <img class="aui-img-round" src="../../images/kefu000.png" alt="">
+            </div>
+            <div class="uC-name" onclick="userName()"><img src="../../images/loading-1.gif" alt="用户名"></div>
+        </div>
+        <ul class="aui-list aui-margin-t-15">
+            <li class="aui-list-item" onclick="notLogin('myOrder')">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">我的订单</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+            <li class="aui-list-item " onclick="notLogin('myWallet')">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">我的钱包</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+        	<li class="aui-list-item " onclick="notLogin('safetySet')">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">安全设置</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-margin-t-15">
+        	<li class="aui-list-item" onclick="window.location.href = '/view/html/helpCenter.html'">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">帮助中心</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+            <li class="aui-list-item " onclick="window.location.href = '/view/html/aboutUs.html'">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">关于我们</div>
+                    <i class="aui-iconfont aui-icon-right"></i>
+                </div>
+            </li>
+        </ul>
+    </div>
+</article>
+<footer class="aui-card-list-footer oD-footer aui-border-t" style="display:none">
+    <div class="aui-btn aui-btn-basic aui-btn-block" onclick="outLogin();">注销登录</div>
+</footer>
+</body>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/myCommon.js"></script>
+<script src="../../js/publicSpace.js"></script>
+<script>
+    var getUserInfo = JSON.parse(localStorage.getItem("setUserInfo"));
+    console.log(getUserInfo);
+    if(getUserInfo == null){
+        $(".aui-card-list-footer").hide();
+        $(".c_body").removeClass("Fbtn-L-body");
+        $(".uC-name").html("登录/注册");
+    }else{
+        $(".aui-card-list-footer").show();
+        $(".c_body").addClass("Fbtn-L-body");
+        $(".uC-name").html((getUserInfo[0].userPhone == null) ? ( (/^1[345678]\d{9}$/.test(getUserInfo[0].userName)) ? (getUserInfo[0].userName).substring(0, 7) + "****" : getUserInfo[0].userName ): (getUserInfo[0].userPhone).substring(0, 7) + "****");
+    }
+    function userName(){
+        if($(".uC-name").html() == "登录/注册"){
+            //iframe层-登录页
+            loginLayerBox();
+        }
+    }
+</script>
+</html>
