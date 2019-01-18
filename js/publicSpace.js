@@ -794,7 +794,7 @@ function typePageBtnEvent(type,obj) {
 		var value=obj.id.slice(13);
 		window.location.href = '/view/html/chooseHero.html?type='+type+'&value='+value;
 	}else if(obj.id=="typeReturn"){//头部返回按钮
-		window.location.href = '/view/html/index.html';
+		window.location.href = 'index.html';
 	}
 }
 
