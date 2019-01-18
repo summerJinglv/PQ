@@ -11,11 +11,11 @@ function notLogin(data,type){
     	}
     	loginLayerBox();
     }else if(data == "myWallet"){
-        window.location.href="/view/html/wallet.html";
+        window.location.href="wallet.html";
     }else if(data == "myOrder"){
-        window.location.href="/view/html/myOrder.html";
+        window.location.href="myOrder.html";
     }else if(data == "safetySet"){
-        window.location.href = '/view/html/safetySet.html';
+        window.location.href = 'safetySet.html';
     }else if(data == "chatBtn"){
         $.ajax({
             url: "/getIndexMessage_NL",
@@ -25,12 +25,12 @@ function notLogin(data,type){
                 console.log(data);
                 if(data.num > 0){
                 	if (data.messageFrom == '30') {
-                		window.location.href = '/view/html/ptqChat.html?rowId='+data.lastOrderId+'';
+                		window.location.href = 'ptqChat.html?rowId='+data.lastOrderId+'';
                 	} else {
-                		window.location.href = '/view/html/chat.html?rowId='+data.lastOrderId+'';
+                		window.location.href = 'chat.html?rowId='+data.lastOrderId+'';
                 	}
                 }else{
-                    window.location.href = '/view/html/chat.html';
+                    window.location.href = 'chat.html';
                 }
             }
         });
@@ -492,12 +492,12 @@ function consultPrice(type) {
                 layer.msg("即将跳转至咨询页面", {time:1200});
                 sessionStorage.setItem("needCon",JSON.stringify(data));
                 //var db = JSON.parse(sessionStorage.getItem("needCon"));
-                setTimeout(function(){window.location.href="/view/html/chat.html"},1500);
+                setTimeout(function(){window.location.href="chat.html"},1500);
             }else if(data.code == -1){
                 layer.msg("暂时没有可分配的商家");
             }else if(data.code == 2){
                 layer.msg("即将跳转至咨询页面", {time:1200});
-                setTimeout(function(){window.location.href="/view/html/chat.html?rowId="+data.rowId+""},1500);
+                setTimeout(function(){window.location.href="chat.html?rowId="+data.rowId+""},1500);
             }else if(data.code == 88888){
                 layer.msg("登录失效", {time:1000});
                 localStorage.setItem("setUserInfo",null);
@@ -508,7 +508,7 @@ function consultPrice(type) {
                         title: false,
                         area: ['90%','286px'],
                         shade: 0.5,
-                        content: ['/view/html/LoginRegister.html', 'no'],
+                        content: ['LoginRegister.html', 'no'],
                         success:function(layero,index){
                             parent.layer.iframeAuto(index);
                         }
@@ -613,7 +613,7 @@ function classifyCookie(){
     		};
     		sessionStorage.setItem("classifyVal1",JSON.stringify(classifyVal1));
     		setTimeout(function(){
-    			window.location.href = '/view/html/ranking.html?type='+classifyType;
+    			window.location.href = 'ranking.html?type='+classifyType;
     		},500);
     	}
     	if(classifyType == 2){
@@ -628,7 +628,7 @@ function classifyCookie(){
     		};
     		sessionStorage.setItem("classifyVal2",JSON.stringify(classifyVal2));
     		setTimeout(function(){
-    			window.location.href = '/view/html/achievement.html?type='+classifyType;
+    			window.location.href = 'achievement.html?type='+classifyType;
     		},500);
     	}
     	if(classifyType == 3){
@@ -643,7 +643,7 @@ function classifyCookie(){
     		};
     		sessionStorage.setItem("classifyVal3",JSON.stringify(classifyVal3));
     		setTimeout(function(){
-    			window.location.href = '/view/html/reward.html?type='+classifyType;
+    			window.location.href = 'reward.html?type='+classifyType;
     		},500);
     	}
     	if(classifyType == 4){
@@ -672,7 +672,7 @@ function classifyCookie(){
     			sessionStorage.setItem("classifyVal4v45",JSON.stringify(classifyVal4v45));
     		}
     		setTimeout(function(){
-    			window.location.href = '/view/html/proficiency.html?type='+classifyType;
+    			window.location.href = 'proficiency.html?type='+classifyType;
     		},500);
     	}
     	if(classifyType == 5){
@@ -687,7 +687,7 @@ function classifyCookie(){
     		};
     		sessionStorage.setItem("classifyVal5",JSON.stringify(classifyVal5));
     		setTimeout(function(){
-    			window.location.href = '/view/html/goldCoin.html?type='+classifyType;
+    			window.location.href = 'goldCoin.html?type='+classifyType;
     		},500);
     	}
     	if(classifyType == 6){
@@ -702,7 +702,7 @@ function classifyCookie(){
     		};
     		sessionStorage.setItem("classifyVal6",JSON.stringify(classifyVal6));
     		setTimeout(function(){
-    			window.location.href = '/view/html/more.html?type='+classifyType;
+    			window.location.href = 'more.html?type='+classifyType;
     		},500);
     	}
     	layer.msg("保存成功！");
@@ -784,15 +784,15 @@ function typePageBtnEvent(type,obj) {
 	if(obj.id.indexOf("classifyItem")==0){//分类按钮
 		if(type==4){//熟练度页面
 			var value=obj.id.slice(12);
-			window.location.href = '/view/html/classify.html?type='+type+'&value='+value;
+			window.location.href = 'classify.html?type='+type+'&value='+value;
 		}else{
-			window.location.href = '/view/html/classify.html?type='+type;
+			window.location.href = 'classify.html?type='+type;
 		}
 	}else if(obj.id=="heroItem"){//已有英雄按钮
-		window.location.href = '/view/html/chooseHero.html?type='+type;
+		window.location.href = 'chooseHero.html?type='+type;
 	}else if(obj.id.indexOf("selectHeroBtn")==0){//熟练度指定英雄按钮
 		var value=obj.id.slice(13);
-		window.location.href = '/view/html/chooseHero.html?type='+type+'&value='+value;
+		window.location.href = 'chooseHero.html?type='+type+'&value='+value;
 	}else if(obj.id=="typeReturn"){//头部返回按钮
 		window.location.href = 'index.html';
 	}
