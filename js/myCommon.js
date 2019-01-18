@@ -15,7 +15,7 @@ function loginLayerBox(){//登录弹框
 		anim: 2,
 		closeBtn: 0,
 		isOutAnim:false,
-		content: ['/view/html/LoginRegister02.html'],
+		content: ['LoginRegister02.html'],
 		success:function(layero,index){
 			//parent.layer.iframeAuto(index);//登录框高度自适应
 			
@@ -38,7 +38,7 @@ function loginLayerBox(){//登录弹框
 						type:2,
 						title:["商城条款","text-align:center;padding:0;font-size:16px;"],
 						area:['90%','80%'],
-						content:['/view/html/protocol.html'],
+						content:['protocol.html'],
 						shadeClose: true,
 						success:function(layero,index){
 							$(layero).addClass("scroll-wrapper");
@@ -51,7 +51,7 @@ function loginLayerBox(){//登录弹框
 						title:["隐私政策","text-align:center;padding:0;font-size:16px;"],
 						area: ['90%','80%'],
 						shadeClose: true,
-						content:['/view/html/privacyPolicy.html'],
+						content:['privacyPolicy.html'],
 						success:function(layero,index){
 							$(layero).addClass("scroll-wrapper");
 						}
