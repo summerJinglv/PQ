@@ -139,6 +139,16 @@
             }
         }
     });
+	var data={data:[{noticeTitle:'喷塔Q上线了！'},{noticeTitle:'王者荣耀新服，巴拉巴拉。。。。。。。！'}]}
+	for(var i in data.data){
+	    var db=data.data[i];
+	    var notice=$('<li><a href="javascript:;">'+db.noticeTitle+'</a></li>');
+	    $("#noticelist").append(notice);
+	}	
+	//console.log($("#noticelist").find("li").length)
+	    if($("#noticelist").find("li").length>1){
+		setInterval('AutoScroll("#newsScroll")',5000)
+	}
     /*公告垂直滚动*/
     function AutoScroll(obj){
         var $liFist=$(obj).find("ul:first"),
